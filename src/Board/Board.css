@@ -1,0 +1,9 @@
+#canvasBoard{
+    position: absolute;
+    margin-top: 50px;
+    margin-left: 50px;
+
+    border-style: solid;
+    border-width: 10px;
+    border-color: maroon
+}

@@ -1,0 +1,46 @@
+Stack:
+
+  React
+  Python: Flask
+  AWS
+ 
+Software:
+
+  Kanban: Trello
+  Communication: Discord
+
+Screens:
+
+  Login/Logout
+  Load Screen
+  Main Page
+  Profile
+  Select Match
+  Board Screen
+  
+Objectives:
+  
+  Login/Logout:
+  
+    SSO login functionality
+    
+  Load Screen:
+  
+    Generic load screen
+    
+  Main Page:
+  
+  Profile:
+  
+  Select Match:
+  
+  Board Screen:
+  
+    Piece placement
+    Piece movement
+    Piece destruction
+    Drag Drop
+    
+   
+
+

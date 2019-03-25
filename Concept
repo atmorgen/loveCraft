@@ -1,0 +1,79 @@
+Concepts:
+
+  Moves are determined in secret and occur at the same time after they are declared
+  Fog of War (can only see moves and events that happen close enough to any of your units)
+  Seasons (every 1-2 rounds of turns represents one season, different attributes for each season (i.e. cannot grow in the winter)
+  Events?(meeting NPC's out in the world)
+
+Setting:
+
+  LoveCraftian
+
+
+Players:
+
+  2 Players
+
+  both pick starting spot at same time: hidden
+  turns are hidden
+  once both moves have been locked in turns are revealed, resolved at the same time
+
+  
+
+
+
+Board:
+
+  20x20?
+  Auto-generate board with different types of squares:
+  
+    water
+    stone
+    Fertile Soil
+    forest
+
+  Units:
+
+    sustain on 1 food each
+    combine basic units into more complicated ones
+    each costs gold
+
+    Gatherer:
+    
+      Plants Food
+      Gathers Food
+      No planting or gathering in the winter
+      Can only farm on the same spot for 3 seasons before having to find a new one?
+    
+    Soldier:
+    
+      Protects Gatherers
+      Combatant
+      
+    Explorer:
+    
+      Greater Site Range
+      faster
+
+  Resources:
+
+    stone
+    wood
+    gold
+    food
+
+  Gold:
+
+    every once in a while a caravan will spawn somewhere on the map and stay for n number days
+    only way to obtain gold is to sell resources to caravan
+    gold is only way of creating new units
+
+  Seasons:
+
+    seaons switch every 10-15(x) turns
+
+    growing season
+    winter
+      
+    
+    
