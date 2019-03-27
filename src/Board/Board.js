@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './Board.css';
 
-import firebase from 'firebase'
 import { withAuthorization } from '../Routes/Session';
 //For Testing
 import BoardClass from '../BasicClasses/Board/BoardClass';
@@ -16,7 +15,7 @@ class Canvas extends Component {
             canvas:null,
             ctx: null
         }
-        this.size = 100;
+        this.size = 35;
 
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -25,41 +24,23 @@ class Canvas extends Component {
         this.id = this.props.match.params.gameID;
         //Board Information
         this.rects = []
-
+        //For Tile Selection
         this.selectionIndex = null
+        //Get list of keys held down
+        this.keysDown = []
     }
 
     componentDidMount(){
         this.gameInit()
     }
-
-    getUID(){
-        return new Promise((resolve)=>{
-            setTimeout(() => {
-                resolve(this.props.firebase.auth.currentUser.uid)
-            }, 3000);
-        })
-    }
-
-    //examples for now to mess around with
+    
+    //Runs when the player is navigated to the Game route.  Initializes all the necessary objects and pulls the original instance of the board for creation
     async gameInit(){
-        //gives the authorization time to udate
-        var uid = await this.getUID()
         var firestore = new Firestore()
         var matchInfo = await firestore.getBoardInformation(this.id)
-        var matchBoard = Object.assign(new BoardClass(), matchInfo.board)
-        
-        //let testBoard = new BoardClass(this.id,20);
-        //var firestore = new Firestore();
-        //firestore.setNewDoc(this.id,testBoard);
-        
-        // eslint-disable-next-line
-        //var data = await firestore.docSubscription(this.id)
-        //Object.assign(new BoardClass(), JSON.parse(data.Board))
-        
+        var matchBoard = Object.assign(new BoardClass(), matchInfo.board)        
 
         this.setState({board: matchBoard})
-        console.log(this.state)
         this.updateWindowDimensions(this.state.board.size)
 
         this.setState(
@@ -67,12 +48,11 @@ class Canvas extends Component {
                 ctx:this.refs.canvas.getContext('2d'),
                 canvas:this.refs.canvas
             })
-        
-            console.log()
-        this.boardCreation(null)
+        this.boardCreation()
         this.tileSelect();
     }
 
+    //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
         var ctx = this.state.ctx;
         var tiles = JSON.parse(this.state.board.tiles)
@@ -94,43 +74,10 @@ class Canvas extends Component {
             this.rects.push(rectTile)
             this.rect(rectTile,this.size)
         }
-        
-        //setting boxes to a larger or smaller setting to zoom in
-        // eslint-disable-next-line
-        this.state.canvas.onwheel = (e) =>{
-            e.preventDefault(); // stop the page scrolling
-            if (e.deltaY < 0) {
-                this.size = this.size * 1.1; // zoom in
-            } else {
-                this.size = this.size * (1 / 1.1); // zoom out is inverse of zoom in
-            }
-            this.updateWindowDimensions(this.state.board.size)
-            this.boardCreation()
-        }
-
-        //scrolling around the page
-        // eslint-disable-next-line
-        this.state.canvas.tabIndex = 1000;
-        // eslint-disable-next-line
-        this.state.canvas.onkeydown = (e) =>{
-            var key = e.key
-            var scrollX = window.scrollX
-            var scrollY = window.scrollY
-            var rate = 25
-            
-            if(key === 'a'){
-                scrollX-=rate
-            }else if(key === 'd'){
-                scrollX+=rate
-            }else if(key === 'w'){
-                scrollY-=rate
-            }else if(key === 's'){
-                scrollY+=rate
-            }
-            window.scrollTo(scrollX,scrollY)
-        }
+        this.mapMovementEvents()
     }
 
+    //Creates and draws the rectangles within the canvas
     rect(props,size) {
         const {ctx, x, y, color, stroke, border} = props;
         ctx.rect(x,y,size,size);
@@ -147,7 +94,6 @@ class Canvas extends Component {
 
     tileSelect(){
         // eslint-disable-next-line
-        console.log('asdf')
         this.state.canvas.onmousedown= (e)=>{
 
             var clientRect = this.state.canvas.getBoundingClientRect(),
@@ -177,6 +123,51 @@ class Canvas extends Component {
      updateWindowDimensions(input) {
         var size = this.size*input
         this.setState({ width: size, height: size })
+    }
+
+    //Inits the scroll and keydown events for viewing the map
+    mapMovementEvents(){
+        //setting boxes to a larger or smaller setting to zoom in
+        // eslint-disable-next-line
+        this.state.canvas.onwheel = (e) =>{
+            e.preventDefault(); // stop the page scrolling
+            if (e.deltaY < 0) {
+                if(this.size < 80)
+                    this.size = this.size * 1.1; // zoom in
+            } else if(this.size > 35) {
+                this.size = this.size * (1 / 1.1); // zoom out is inverse of zoom in
+            }
+            this.updateWindowDimensions(this.state.board.size)
+            this.boardCreation()
+        }
+
+        // eslint-disable-next-line
+        this.state.canvas.onkeydown = (e) =>{
+            if(this.keysDown.indexOf(e.key)===-1) this.keysDown.push(e.key)
+        }
+        // eslint-disable-next-line
+        this.state.canvas.onkeyup = (e) =>{
+            this.keysDown.splice(this.keysDown.indexOf(e.key),1)
+        }
+        
+        // eslint-disable-next-line
+        this.state.canvas.tabIndex = 1000;
+        setInterval(() => {
+            var scrollX = window.scrollX
+            var scrollY = window.scrollY
+            var rate = 4
+            
+            if(this.keysDown.indexOf('a')>-1){
+                scrollX-=rate
+            }else if(this.keysDown.indexOf('d')>-1){
+                scrollX+=rate
+            }else if(this.keysDown.indexOf('w')>-1){
+                scrollY-=rate
+            }else if(this.keysDown.indexOf('s')>-1){
+                scrollY+=rate
+            }
+            window.scrollTo(scrollX,scrollY)
+        }, 100);
     }
 
     render() {
