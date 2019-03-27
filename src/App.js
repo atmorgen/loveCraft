@@ -26,7 +26,7 @@ const App = () => {
           <Route path={ROUTES.HOME} component={HomePage} />
           <Route path={ROUTES.PROFILE} component={Profile} />
           <Route exact path={ROUTES.SEARCH} component={Search} />
-          <Route path={`${ROUTES.SEARCH}/:gameID`} component={Board} />
+          <Route path={`${ROUTES.GAMEPAGE}/:gameID`} component={Board} />
         </Router>
     );
 }

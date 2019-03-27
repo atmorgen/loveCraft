@@ -38,8 +38,6 @@ class Firestore{
             this.db.collection(DB.MATCHMAKING).doc(docID).delete().then(function(){
                 console.log("Removed from Queue")
                 resolve()
-            }).catch(function(error){
-                console.log("Error removing from Queue!")
             })
         })
     }
@@ -48,6 +46,8 @@ class Firestore{
         return new Promise((resolve)=>{
             this.db.collection(DB.USERS).doc(uid).get().then(function(doc){
                 resolve(doc.data().username.replace(/"/g,""))
+            }).catch(function(error){
+                console.log("Error Getting UserName")
             })
         })
     }
