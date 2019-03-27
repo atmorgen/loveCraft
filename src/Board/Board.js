@@ -35,7 +35,7 @@ export default class Canvas extends Component {
         firestore.setNewDoc(this.id,testBoard);
         
         // eslint-disable-next-line
-        var data = await firestore.docSubscription(this.id)
+        //var data = await firestore.docSubscription(this.id)
         //Object.assign(new BoardClass(), JSON.parse(data.Board))
         var obj = testBoard
 

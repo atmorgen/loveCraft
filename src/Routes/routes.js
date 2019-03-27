@@ -6,3 +6,4 @@ export const PROFILE = '/profile';
 export const ADMIN = '/admin';
 export const PASSWORD_FORGET = '/pw-forget';
 export const SEARCH = '/search';
+export const GAMEPAGE = '/game';
