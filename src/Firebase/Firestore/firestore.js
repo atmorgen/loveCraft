@@ -66,6 +66,17 @@ class Firestore{
         });
     }
 
+    getBoardInformation(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                var output = doc.exists ? 
+                    doc.data() :
+                    "No such doc!";
+                resolve(output)
+            })
+        })
+    }
+
 }
 
 export default Firestore
