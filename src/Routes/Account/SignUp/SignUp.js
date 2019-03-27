@@ -5,6 +5,9 @@ import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 
 import { withFirebase } from '../../../Firebase';
+import firebase from 'firebase';
+
+import { Firestore } from '../../../Firebase/Firestore';
 
 const INITIAL_STATE = {
     username: '',
@@ -37,14 +40,21 @@ class SignUpFormBase extends Component {
         this.props.firebase
           .doCreateUserWithEmailAndPassword(email, passwordOne)
           .then(authUser => {
+            this.addUserToFirestore(authUser,username)
             this.setState({ ...INITIAL_STATE });
-            console.log('test')
           })
           .catch(error => {
             this.setState({ error });
           });
     
         event.preventDefault();
+    }
+
+    //creates a new userAccount within the firestore with the doc id that matches the UID from signing up
+    addUserToFirestore(authUser,username){
+        var firestore = new Firestore()
+        var uid = (authUser.user.uid).replace(/"/g,"")
+        firestore.setNewUSER(uid,username)
     }
 
     onChange = event => {
@@ -75,7 +85,7 @@ class SignUpFormBase extends Component {
                     value={username}
                     onChange={this.onChange}
                     type="text"
-                    placeholder="Full Name"
+                    placeholder="Username"
                 />
                 <input
                     name="email"

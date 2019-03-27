@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import './Board.css';
+
+import firebase from 'firebase'
+import { withAuthorization } from '../Routes/Session';
 //For Testing
 import BoardClass from '../BasicClasses/Board/BoardClass';
 import { Firestore } from '../Firebase/Firestore';
 
-export default class Canvas extends Component {
+class Canvas extends Component {
     constructor(props) {
         super(props);
         this.state = { 
@@ -20,26 +23,43 @@ export default class Canvas extends Component {
         this.tileSelect = this.tileSelect.bind(this);
         //Firestore
         this.id = this.props.match.params.gameID;
-        this.gameInit();
-
         //Board Information
         this.rects = []
 
         this.selectionIndex = null
     }
 
+    componentDidMount(){
+        this.gameInit()
+    }
+
+    getUID(){
+        return new Promise((resolve)=>{
+            setTimeout(() => {
+                resolve(this.props.firebase.auth.currentUser.uid)
+            }, 3000);
+        })
+    }
+
     //examples for now to mess around with
     async gameInit(){
-        let testBoard = new BoardClass(this.id,20);
-        var firestore = new Firestore();
-        firestore.setNewDoc(this.id,testBoard);
+        //gives the authorization time to udate
+        var uid = await this.getUID()
+        var firestore = new Firestore()
+        var matchInfo = await firestore.getBoardInformation(this.id)
+        var matchBoard = Object.assign(new BoardClass(), matchInfo.board)
+        
+        //let testBoard = new BoardClass(this.id,20);
+        //var firestore = new Firestore();
+        //firestore.setNewDoc(this.id,testBoard);
         
         // eslint-disable-next-line
-        var data = await firestore.docSubscription(this.id)
+        //var data = await firestore.docSubscription(this.id)
         //Object.assign(new BoardClass(), JSON.parse(data.Board))
-        var obj = testBoard
+        
 
-        this.setState({board: obj})
+        this.setState({board: matchBoard})
+        console.log(this.state)
         this.updateWindowDimensions(this.state.board.size)
 
         this.setState(
@@ -48,13 +68,14 @@ export default class Canvas extends Component {
                 canvas:this.refs.canvas
             })
         
+            console.log()
         this.boardCreation(null)
         this.tileSelect();
     }
-    test = 1
+
     boardCreation(){
         var ctx = this.state.ctx;
-        var tiles = this.state.board.tiles
+        var tiles = JSON.parse(this.state.board.tiles)
         this.rects = []
         
         ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
@@ -140,7 +161,7 @@ export default class Canvas extends Component {
                 }  
             }
             this.boardCreation()
-            var tiles = this.state.board.tiles;
+            var tiles = JSON.parse(this.state.board.tiles);
             console.log(tiles[this.selectionIndex])
         }
     }
@@ -167,3 +188,7 @@ export default class Canvas extends Component {
         )
     }
 }
+
+const condition = authUser => !!authUser;
+
+export default withAuthorization(condition)(Canvas);

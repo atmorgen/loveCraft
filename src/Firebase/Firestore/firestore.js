@@ -7,21 +7,49 @@ class Firestore{
         this.db = firebase.firestore();
     }
 
-    /**
-     * Creates a new document of data within the targetted collection
-     * @param {string} docName The name of the doc to be added
-     * @param {Object} data The Object to be stringified and stored
-     */
-    setNewDoc(docName,data){
-        this.db.collection(DB.BOARDS).doc(docName).set({
-            [DB.BOARD]:JSON.stringify(data)
+    setNewUSER(docName,data){
+        this.db.collection(DB.USERS).doc(docName).set({
+            username:JSON.stringify(data)
         })
         .then(function(docRef) {
-            console.log("Document successfully written!");
+            console.log("New User Created!");
         })
         .catch(function(error) {
-            console.error("Error adding document: ", error);
+            console.error("Error adding user: ", error);
         });
+    }
+
+    addUserToMatchmakingQueue(username,uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHMAKING).add({
+                player:username,
+                id:uid
+            }).then(function(doc){
+                console.log("Added to Queue with an ID of: ",doc.id)
+                resolve(doc.id)
+            }).catch((error)=>{
+                console.log("There was an error adding to Matchmaking",error)
+            })
+        })
+    }
+
+    removeUserFromMatchmakingQueue(docID){
+        return new Promise((resolve) =>{
+            this.db.collection(DB.MATCHMAKING).doc(docID).delete().then(function(){
+                console.log("Removed from Queue")
+                resolve()
+            })
+        })
+    }
+
+    getUserName(uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.USERS).doc(uid).get().then(function(doc){
+                resolve(doc.data().username.replace(/"/g,""))
+            }).catch(function(error){
+                console.log("Error Getting UserName")
+            })
+        })
     }
 
     readDoc(docName){
@@ -38,21 +66,17 @@ class Firestore{
         });
     }
 
-    /**
-     * creates a subscrition event for the specified doc.  Dont forget 
-     * to set your event to await.  i.e. var test = await docSubscription(docName)
-     * @param {string} docName The name of the doc to be subscribed to
-     */
-    async docSubscription(docName){
-        return new Promise((resolve) => 
-            firebase.firestore().collection(DB.BOARDS).doc(docName)
-                .onSnapshot(function(doc){
-                    resolve(doc.data())
-                })
-        )
-            
-            
+    getBoardInformation(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                var output = doc.exists ? 
+                    doc.data() :
+                    "No such doc!";
+                resolve(output)
+            })
+        })
     }
+
 }
 
 export default Firestore

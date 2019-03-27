@@ -10,6 +10,7 @@ import PasswordForgetPage from './Routes/Account/PasswordForget/PasswordForget';
 import HomePage from './Routes/HomePage/HomePage';
 import Profile from './Routes/Profile/Profile';
 import Search from './Routes/Search/Search';
+import Board from './Board/Board';
 
 import { withAuthentication } from './Routes/Session';
 
@@ -24,7 +25,8 @@ const App = () => {
           <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
           <Route path={ROUTES.HOME} component={HomePage} />
           <Route path={ROUTES.PROFILE} component={Profile} />
-          <Route path={ROUTES.SEARCH} component={Search} />
+          <Route exact path={ROUTES.SEARCH} component={Search} />
+          <Route path={`${ROUTES.GAMEPAGE}/:gameID`} component={Board} />
         </Router>
     );
 }

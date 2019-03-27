@@ -9,7 +9,7 @@ export default class BoardClass{
         this.units = [];
         this.tiles = [];
 
-        this.initBoard();
+        //this.initBoard();
     }
 
     initBoard(){
