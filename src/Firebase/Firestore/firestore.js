@@ -66,6 +66,16 @@ class Firestore{
         });
     }
 
+    getMatchIDFromProfile(uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.USERS).doc(uid).get().then(function(doc){
+                if(doc.exists){
+                    resolve(doc.data())
+                }
+            })
+        })
+    }
+
     getBoardInformation(matchID){
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){

@@ -5,6 +5,12 @@ import { withAuthorization } from '../Routes/Session';
 //For Testing
 import BoardClass from '../BasicClasses/Board/BoardClass';
 import { Firestore } from '../Firebase/Firestore';
+import firebase from 'firebase'
+import * as DB from '../Firebase/Firestore/DB';
+import * as ROUTES from '../Routes/routes';
+
+//Tile Images
+import fertilePic from '../BasicClasses/Board/Tiles/fertileSoil.png'
 
 class Canvas extends Component {
     constructor(props) {
@@ -22,6 +28,7 @@ class Canvas extends Component {
         this.tileSelect = this.tileSelect.bind(this);
         //Firestore
         this.id = this.props.match.params.gameID;
+        this.db = firebase.firestore()
         //Board Information
         this.rects = []
         //For Tile Selection
@@ -33,23 +40,57 @@ class Canvas extends Component {
     componentDidMount(){
         this.gameInit()
     }
+
+    getUID(){
+        return new Promise((resolve)=>{
+            setTimeout(() => {
+                resolve(this.props.firebase.auth.currentUser.uid)
+            }, 1000);
+        })
+    }
     
     //Runs when the player is navigated to the Game route.  Initializes all the necessary objects and pulls the original instance of the board for creation
     async gameInit(){
         var firestore = new Firestore()
-        var matchInfo = await firestore.getBoardInformation(this.id)
-        var matchBoard = Object.assign(new BoardClass(), matchInfo.board)        
+        //getting the matchID from the users profile db
+        var matchID = (await firestore.getMatchIDFromProfile(await this.getUID())).match
 
-        this.setState({board: matchBoard})
-        this.updateWindowDimensions(this.state.board.size)
+        //if the gameID url matches the expected matchID from the users profile then continue
+        if(matchID===this.id){
+            //retrive the matchInfo
+            var matchInfo = await firestore.getBoardInformation(matchID)       
+            //sets the firestore json into a new BoardClass and updates it into this.state.board
+            this.setState({board: Object.assign(new BoardClass(), matchInfo.board)})
+            //updates the size of the board to match the total size of all the rects in the canvas
+            this.updateWindowDimensions(this.state.board.size)
+            //inits the context and canvas refs
+            this.setState(
+                {
+                    ctx:this.refs.canvas.getContext('2d'),
+                    canvas:this.refs.canvas
+                })
+            //creates the boards
+            this.boardCreation()
+            //inits the tileSelection events
+            this.tileSelect();
+            //Sets subscription events for rest of the match
+            this.boardSubscription()
+        //else redirect the user to the correct matchID url
+        }else{
+            window.location.href=`..${ROUTES.GAMEPAGE}/${matchID}`
+        }
+        
+    }
 
-        this.setState(
-            {
-                ctx:this.refs.canvas.getContext('2d'),
-                canvas:this.refs.canvas
+    //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+    boardSubscription(){
+        this.db.collection(DB.MATCHES).doc(this.id)
+            .onSnapshot((doc)=>{
+                //setting board state
+                this.setState({board: Object.assign(new BoardClass(), doc.data().board)})
+                //rerunning board creation
+                this.boardCreation();
             })
-        this.boardCreation()
-        this.tileSelect();
     }
 
     //Responsible for redrawing the rectangles each time there is an update
@@ -69,7 +110,8 @@ class Canvas extends Component {
                 y:(this.size*tile.position.y), 
                 color:tile.color, 
                 stroke:strokeColor,
-                border:borderWidth
+                border:borderWidth,
+                image:fertilePic
             }
             this.rects.push(rectTile)
             this.rect(rectTile,this.size)
@@ -78,8 +120,9 @@ class Canvas extends Component {
     }
 
     //Creates and draws the rectangles within the canvas
-    rect(props,size) {
-        const {ctx, x, y, color, stroke, border} = props;
+    async rect(props,size) {
+        const {ctx, x, y, color, stroke, border, image} = props;
+        
         ctx.rect(x,y,size,size);
 
         ctx.beginPath()
@@ -90,6 +133,11 @@ class Canvas extends Component {
         ctx.lineWidth=border;
         ctx.strokeStyle=stroke;
         ctx.strokeRect(x,y,size,size);
+        
+        //ignore this for now not working
+        var img = new Image()
+        img.src = '../BasicClasses/Board/Tiles/fertileSoil.png'
+        ctx.drawImage(img,x,y,size,size)
     }
 
     tileSelect(){
