@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import * as ROUTES from '../routes';
 import Board from '../../Board/Board';
 import './Search.css';
+import firebase from 'firebase';
 
 import { withAuthorization } from '../Session';
 
@@ -12,6 +13,7 @@ class Search extends Component {
     constructor(){
         super()
         this.beginSearch = this.beginSearch.bind(this);
+        console.log(firebase.auth())
     }
 
     state = {  }

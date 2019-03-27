@@ -24,6 +24,18 @@ class Firestore{
         });
     }
 
+    setNewUSER(docName,data){
+        this.db.collection(DB.USERS).doc(docName).set({
+            username:JSON.stringify(data)
+        })
+        .then(function(docRef) {
+            console.log("New User Created!");
+        })
+        .catch(function(error) {
+            console.error("Error adding user: ", error);
+        });
+    }
+
     readDoc(docName){
         this.db.collection(DB.BOARDS).doc(docName).get().then(function(doc){
             var output = doc.exists ? 

@@ -20,7 +20,7 @@ export default class Canvas extends Component {
         this.tileSelect = this.tileSelect.bind(this);
         //Firestore
         this.id = this.props.match.params.gameID;
-        this.gameInit();
+        //this.gameInit();
 
         //Board Information
         this.rects = []
