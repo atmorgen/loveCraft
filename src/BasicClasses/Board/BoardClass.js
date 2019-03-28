@@ -1,5 +1,3 @@
-import BoardRNG from './BoardRNG';
-
 /* Basic Class for Instantiating a new Board */
 export default class BoardClass{
 
@@ -8,14 +6,6 @@ export default class BoardClass{
         this.size = size;
         this.units = [];
         this.tiles = [];
-
-        //this.initBoard();
-    }
-
-    initBoard(){
-        //generates a board of random tiles out of the tileCollection array above
-        var rng = new BoardRNG(this.size);        
-        this.tiles = rng.BoardDecision();
     }
 
     //gets random index position of input

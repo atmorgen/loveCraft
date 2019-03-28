@@ -5,6 +5,7 @@ export default class ForestTile extends TileAbstract{
     constructor(x,y){
         super(x,y)
         this.color = "darkgreen";
+        this.classType = 'Forest';
     }
 
     getColor(){

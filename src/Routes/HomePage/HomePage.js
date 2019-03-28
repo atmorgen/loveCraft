@@ -3,7 +3,6 @@ import './HomePage.css';
 
 import { withAuthorization } from '../Session';
 
-
 class HomePage extends Component {
     state = {  }
     render() { 

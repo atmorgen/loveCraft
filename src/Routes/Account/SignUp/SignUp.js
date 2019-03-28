@@ -5,8 +5,6 @@ import { Link, withRouter } from 'react-router-dom';
 import { compose } from 'recompose';
 
 import { withFirebase } from '../../../Firebase';
-import firebase from 'firebase';
-
 import { Firestore } from '../../../Firebase/Firestore';
 
 const INITIAL_STATE = {

@@ -19,29 +19,6 @@ class Firestore{
         });
     }
 
-    addUserToMatchmakingQueue(username,uid){
-        return new Promise((resolve)=>{
-            this.db.collection(DB.MATCHMAKING).add({
-                player:username,
-                id:uid
-            }).then(function(doc){
-                console.log("Added to Queue with an ID of: ",doc.id)
-                resolve(doc.id)
-            }).catch((error)=>{
-                console.log("There was an error adding to Matchmaking",error)
-            })
-        })
-    }
-
-    removeUserFromMatchmakingQueue(docID){
-        return new Promise((resolve) =>{
-            this.db.collection(DB.MATCHMAKING).doc(docID).delete().then(function(){
-                console.log("Removed from Queue")
-                resolve()
-            })
-        })
-    }
-
     getUserName(uid){
         return new Promise((resolve)=>{
             this.db.collection(DB.USERS).doc(uid).get().then(function(doc){
@@ -64,6 +41,67 @@ class Firestore{
         }).catch(function(error) {
             console.log("Error getting document:", error);
         });
+    }
+
+    ///////Match Data///////////////
+
+    getMatchIDFromProfile(uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.USERS).doc(uid).get().then(function(doc){
+                if(doc.exists){
+                    resolve(doc.data())
+                }
+            })
+        })
+    }
+
+    removeUserFromMatchmakingQueue(docID){
+        console.log(docID)
+        return new Promise((resolve) =>{
+            this.db.collection(DB.MATCHMAKING).doc(docID).delete().then(function(){
+                console.log("Removed from Queue")
+                resolve()
+            }).catch(function(error) {
+                console.error("Error removing player: ", error);
+            });
+        })
+    }
+    
+    addUserToMatchmakingQueue(username,uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHMAKING).add({
+                player:username,
+                id:uid
+            }).then(function(doc){
+                console.log("Added to Queue with an ID of: ",doc.id)
+                resolve(doc.id)
+            }).catch((error)=>{
+                console.log("There was an error adding to Matchmaking",error)
+            })
+        })
+    }
+
+    removeUsersFromMatch(matchID,uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).delete().then(function(){
+                console.log('Match Deleted')
+                resolve()
+            }).catch(function(error) {
+                console.error("Error removing Match: ", error);
+                resolve()
+            });
+        })
+    }
+
+    removeMatchFromUserProfile(uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.USERS).doc(uid).update({
+                match:firebase.firestore.FieldValue.delete()
+            }).then(function(){
+                console.log('Match removed from Users Profile')
+                resolve()
+            })
+        })
     }
 
     getBoardInformation(matchID){

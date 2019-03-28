@@ -49,9 +49,7 @@ class Search extends Component {
         return (  
             <React.Fragment>
                 <this.SearchScreen />
-                <hr />
-
-                
+                <hr /> 
             </React.Fragment>
         );
     }
@@ -98,13 +96,15 @@ class Search extends Component {
         })
     }
 
-    stopListener(uid){
+    stopListener(){
         this.queueListener()
         console.log("Listener Off")
     }
 
     componentWillUnmount(){
-        this.cancelSearch()
+        if(this.state.isQueue){
+            this.cancelSearch()
+        }
     }
 
     gotToGamePage(gameID) {
