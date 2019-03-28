@@ -8,9 +8,8 @@ import { Firestore } from '../Firebase/Firestore';
 import firebase from 'firebase'
 import * as DB from '../Firebase/Firestore/DB';
 import * as ROUTES from '../Routes/routes';
-
-//Tile Images
-import fertilePic from '../BasicClasses/Board/Tiles/fertileSoil.png'
+//Functions
+import BoardFunctions from './BoardFunctions'
 
 class Canvas extends Component {
     constructor(props) {
@@ -22,19 +21,24 @@ class Canvas extends Component {
             ctx: null
         }
         this.size = 35;
-
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.tileSelect = this.tileSelect.bind(this);
+        this.leaveMatch = this.leaveMatch.bind(this)
         //Firestore
+        this.firestore = new Firestore()
         this.id = this.props.match.params.gameID;
         this.db = firebase.firestore()
+        this.matchID=null
+        this.uid=null
         //Board Information
         this.rects = []
         //For Tile Selection
         this.selectionIndex = null
         //Get list of keys held down
         this.keysDown = []
+        //Functions
+        this.boardFunctions = new BoardFunctions()
     }
 
     componentDidMount(){
@@ -51,14 +55,14 @@ class Canvas extends Component {
     
     //Runs when the player is navigated to the Game route.  Initializes all the necessary objects and pulls the original instance of the board for creation
     async gameInit(){
-        var firestore = new Firestore()
         //getting the matchID from the users profile db
-        var matchID = (await firestore.getMatchIDFromProfile(await this.getUID())).match
+        this.uid = await this.getUID()
+        this.matchID = (await this.firestore.getMatchIDFromProfile(this.uid)).match
 
         //if the gameID url matches the expected matchID from the users profile then continue
-        if(matchID===this.id){
+        if(this.matchID===this.id){
             //retrive the matchInfo
-            var matchInfo = await firestore.getBoardInformation(matchID)       
+            var matchInfo = await this.firestore.getBoardInformation(this.matchID)       
             //sets the firestore json into a new BoardClass and updates it into this.state.board
             this.setState({board: Object.assign(new BoardClass(), matchInfo.board)})
             //updates the size of the board to match the total size of all the rects in the canvas
@@ -77,79 +81,64 @@ class Canvas extends Component {
             this.boardSubscription()
         //else redirect the user to the correct matchID url
         }else{
-            window.location.href=`..${ROUTES.GAMEPAGE}/${matchID}`
-        }
-        
+            window.location.href=`..${ROUTES.GAMEPAGE}/${this.matchID}`
+        }  
+    }
+
+    async leaveMatch(){
+        await this.firestore.removeUsersFromMatch(this.matchID,this.uid)
+        await this.firestore.removeMatchFromUserProfile(this.uid)
+        window.location.href=`../..${ROUTES.SEARCH}`
     }
 
     //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
     boardSubscription(){
         this.db.collection(DB.MATCHES).doc(this.id)
             .onSnapshot((doc)=>{
-                //setting board state
-                this.setState({board: Object.assign(new BoardClass(), doc.data().board)})
-                //rerunning board creation
-                this.boardCreation();
+                if(doc.data() !== undefined){
+                    //setting board state
+                    this.setState({board: Object.assign(new BoardClass(), doc.data().board)})
+                    //rerunning board creation
+                    this.boardCreation();
+                }else{
+                    this.leaveMatch()
+                }
             })
     }
 
     //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
-        var ctx = this.state.ctx;
         var tiles = JSON.parse(this.state.board.tiles)
         this.rects = []
         
-        ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
+        this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
         for(var i = 0;i<tiles.length;i++){
             var tile = tiles[i]
             var strokeColor = this.selectionIndex === i ? 'red':'black';
             var borderWidth = this.selectionIndex === i ? 4:2.2;
             var rectTile = {
-                ctx, 
+                ctx:this.state.ctx, 
                 x:(this.size*tile.position.x), 
                 y:(this.size*tile.position.y), 
                 color:tile.color, 
                 stroke:strokeColor,
-                border:borderWidth,
-                image:fertilePic
+                border:borderWidth
             }
             this.rects.push(rectTile)
-            this.rect(rectTile,this.size)
+            this.boardFunctions.rect(rectTile,this.size)
         }
         this.mapMovementEvents()
-    }
-
-    //Creates and draws the rectangles within the canvas
-    async rect(props,size) {
-        const {ctx, x, y, color, stroke, border, image} = props;
-        
-        ctx.rect(x,y,size,size);
-
-        ctx.beginPath()
-        ctx.fillStyle=color;
-        
-        ctx.fillRect(x,y,size,size);
-        
-        ctx.lineWidth=border;
-        ctx.strokeStyle=stroke;
-        ctx.strokeRect(x,y,size,size);
-        
-        //ignore this for now not working
-        var img = new Image()
-        img.src = '../BasicClasses/Board/Tiles/fertileSoil.png'
-        ctx.drawImage(img,x,y,size,size)
     }
 
     tileSelect(){
         // eslint-disable-next-line
         this.state.canvas.onmousedown= (e)=>{
-
             var clientRect = this.state.canvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top
             for(var i = 0;i<this.rects.length;i++){
                 var rect = this.rects[i];
-                if(this.withinTile(rect,x,y)) {
+                if(this.boardFunctions.withinTile(rect,x,y,this.size)) {
                     this.selectionIndex = i;
                     break;
                 }  
@@ -157,14 +146,6 @@ class Canvas extends Component {
             this.boardCreation()
             var tiles = JSON.parse(this.state.board.tiles);
             console.log(tiles[this.selectionIndex])
-        }
-    }
-
-    withinTile(tile,x,y){
-        if(x >= tile.x && y >= tile.y){
-            if(x <= (tile.x+this.size) && y <= (tile.y+this.size)){
-                return true;
-            }
         }
     }
 
@@ -222,6 +203,7 @@ class Canvas extends Component {
         return (
             <React.Fragment>
                 <div>ID: {this.props.match.params.gameID}</div>
+                <button onClick={this.leaveMatch}>Leave Match</button>
                 <canvas id='canvasBoard' ref='canvas' width={this.state.width} height={this.state.height}></canvas>
             </React.Fragment>
         )
