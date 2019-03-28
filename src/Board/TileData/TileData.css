@@ -1,0 +1,19 @@
+#tileDataBox{
+    border: 1px solid black;
+    position: fixed;
+    width: 200px;
+    height: 100px;
+    background: white;
+    opacity: .85;
+    visibility: hidden;
+}
+
+#clsBtn{
+    position: absolute;
+    left: 92%;
+    top: -5%;
+    font-size: 20px;
+    cursor: pointer;
+    height:auto;
+    width:auto;
+}

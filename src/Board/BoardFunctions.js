@@ -1,4 +1,19 @@
+import {FertileSoil, 
+WaterTile,
+MountainTile,
+ForestTile} from '../BasicClasses/Board/Tiles';
+import BoardClass from '../BasicClasses/Board/BoardClass';
+
 export default class BoardFunctions{
+
+    constructor(){
+        this.tileTypes = [
+            FertileSoil,
+            WaterTile,
+            MountainTile,
+            ForestTile
+        ]
+    }
 
     withinTile(tile,x,y,size){
         if(x >= tile.x && y >= tile.y){
@@ -21,5 +36,22 @@ export default class BoardFunctions{
         ctx.lineWidth=border;
         ctx.strokeStyle=stroke;
         ctx.strokeRect(x,y,size,size); 
+    }
+
+    //reclassifies the Board and all the tiles within it to the correct type of class object
+    reClassifyBoard(brd){
+        var board = Object.assign(new BoardClass(),brd)
+        var tiles = JSON.parse(board.tiles)
+        board.clearTiles()
+        for(var i = 0;i<tiles.length;i++){
+            var tile = tiles[i]
+            for(var j = 0;j<this.tileTypes.length;j++){
+                if(tile.classType == new this.tileTypes[j]().classType){
+                    board.addTile(new this.tileTypes[j](tile.position.x,tile.position.y))
+                    break;
+                }
+            }
+        }
+        return board
     }
 }

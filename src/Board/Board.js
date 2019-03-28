@@ -10,6 +10,8 @@ import * as DB from '../Firebase/Firestore/DB';
 import * as ROUTES from '../Routes/routes';
 //Functions
 import BoardFunctions from './BoardFunctions'
+//Tile UI Component
+import TileData from './TileData/TileData';
 
 class Canvas extends Component {
     constructor(props) {
@@ -18,7 +20,8 @@ class Canvas extends Component {
             width: 0, 
             height: 0,
             canvas:null,
-            ctx: null
+            ctx: null,
+            selectedTile: null
         }
         this.size = 35;
         //Bindings
@@ -33,6 +36,7 @@ class Canvas extends Component {
         this.uid=null
         //Board Information
         this.rects = []
+        this.tiles = []
         //For Tile Selection
         this.selectionIndex = null
         //Get list of keys held down
@@ -64,7 +68,8 @@ class Canvas extends Component {
             //retrive the matchInfo
             var matchInfo = await this.firestore.getBoardInformation(this.matchID)       
             //sets the firestore json into a new BoardClass and updates it into this.state.board
-            this.setState({board: Object.assign(new BoardClass(), matchInfo.board)})
+            var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
+            this.setState({board: boardReclassified})
             //updates the size of the board to match the total size of all the rects in the canvas
             this.updateWindowDimensions(this.state.board.size)
             //inits the context and canvas refs
@@ -85,6 +90,11 @@ class Canvas extends Component {
         }  
     }
 
+    componentWillUnmount(){
+        this.leaveMatch()
+    }
+
+    //deletes the instance of the match
     async leaveMatch(){
         await this.firestore.removeUsersFromMatch(this.matchID,this.uid)
         await this.firestore.removeMatchFromUserProfile(this.uid)
@@ -97,7 +107,8 @@ class Canvas extends Component {
             .onSnapshot((doc)=>{
                 if(doc.data() !== undefined){
                     //setting board state
-                    this.setState({board: Object.assign(new BoardClass(), doc.data().board)})
+                    var reclassedBoard = this.boardFunctions.reClassifyBoard(doc.data().board)
+                    this.setState({board: reclassedBoard})
                     //rerunning board creation
                     this.boardCreation();
                 }else{
@@ -108,18 +119,18 @@ class Canvas extends Component {
 
     //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
-        var tiles = JSON.parse(this.state.board.tiles)
+        this.tiles = this.state.board.tiles
         this.rects = []
-        
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        for(var i = 0;i<tiles.length;i++){
-            var tile = tiles[i]
+        for(var i = 0;i<this.tiles.length;i++){
+            var tile = this.tiles[i]
+            //console.log(tile.getPosition().x,tile.getPosition().y,tile)
             var strokeColor = this.selectionIndex === i ? 'red':'black';
-            var borderWidth = this.selectionIndex === i ? 4:2.2;
+            var borderWidth = this.selectionIndex === i ? 4:.5;
             var rectTile = {
                 ctx:this.state.ctx, 
-                x:(this.size*tile.position.x), 
-                y:(this.size*tile.position.y), 
+                x:(this.size*tile.getPosition().x), 
+                y:(this.size*tile.getPosition().y), 
                 color:tile.color, 
                 stroke:strokeColor,
                 border:borderWidth
@@ -144,8 +155,9 @@ class Canvas extends Component {
                 }  
             }
             this.boardCreation()
-            var tiles = JSON.parse(this.state.board.tiles);
-            console.log(tiles[this.selectionIndex])
+            this.setState({
+                selectedTile:this.tiles[i]
+            })
         }
     }
 
@@ -205,6 +217,7 @@ class Canvas extends Component {
                 <div>ID: {this.props.match.params.gameID}</div>
                 <button onClick={this.leaveMatch}>Leave Match</button>
                 <canvas id='canvasBoard' ref='canvas' width={this.state.width} height={this.state.height}></canvas>
+                <TileData tile={this.state.selectedTile} size={this.size} />
             </React.Fragment>
         )
     }

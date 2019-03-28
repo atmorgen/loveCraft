@@ -5,6 +5,7 @@ export default class MountainTile extends TileAbstract{
     constructor(x,y){
         super(x,y)
         this.color = "gray";
+        this.classType = 'Mountain';
     }
 
     getColor(){

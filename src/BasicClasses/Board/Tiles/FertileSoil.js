@@ -8,6 +8,7 @@ export default class FertileSoil extends TileAbstract{
         this.seedType = null;
         this.color = "green";
         this.image = null;
+        this.classType = 'FertileSoil';
     }
 
     getFertility(){

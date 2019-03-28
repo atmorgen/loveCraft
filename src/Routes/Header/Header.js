@@ -21,10 +21,11 @@ class Navigation extends Component {
         var firestore = new Firestore()
         firebase.auth().onAuthStateChanged(async (user)=> {
             if (user) {
-                var retreivedUser = await firestore.getUserName(user.uid)
+                var retrievedUser = await firestore.getUserName(user.uid)
                 this.setState({
-                    username:retreivedUser
+                    username:retrievedUser
                 })
+                document.title = retrievedUser
             }else{
                 this.setState({
                     username:null
