@@ -26,29 +26,15 @@ class BoardUnits{
 
     async unitCreation(unit,matchID){
         var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
-        console.log(matchUnits)
 
-        /*
-        var toDB = {
+        matchUnits.push({
             name:unit.name,
             position:{
                 x:unit.positions.x,
                 y:unit.positions.y
             }
-        }
+        })
 
-        var second = {
-            name:unit.name,
-            position:{
-                x:15,
-                y:4
-            }
-        }
-
-        matchUnits.push(toDB)
-        matchUnits.push(second)
-
-        */
         this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
     }
 
