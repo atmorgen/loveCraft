@@ -52,6 +52,14 @@ export default class BoardFunctions{
                 }
             }
         }
+        /*
+        var units = JSON.parse(board.units)
+        board.clearUnits()
+        for(var i = 0;i<units.length;i++){
+            var unit = units[i]
+
+        }
+        */
         return board
     }
 }
