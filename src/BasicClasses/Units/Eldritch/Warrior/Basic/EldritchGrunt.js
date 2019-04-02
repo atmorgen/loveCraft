@@ -1,11 +1,12 @@
 import BigCthuluSprite from './big_cthulu.png'
 
 class EldritchGrunt{
-    constructor(size,x,y,context,canvas){
+    constructor(uid,size,x,y,context,canvas){
 
         //////This is the units game information
+        this.owner = uid
         this.name = "Eldritch Grunt"
-
+        this.race = "Eldritch"
 
 
 
@@ -39,6 +40,14 @@ class EldritchGrunt{
         this.interval = null
 
         this.drawImage()
+    }
+
+    getOwner(){
+        return this.owner;
+    }
+
+    setOwner(input){
+        this.owner = input
     }
 
     drawImage(){
