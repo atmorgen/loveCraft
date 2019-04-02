@@ -115,6 +115,24 @@ class Firestore{
         })
     }
 
+    getUnitsFromMatch(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                resolve(doc.data().board.units)
+            })
+        })
+    }
+
+    addUnitsToMatch(matchID,units){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).update({
+                "board.units":units
+            }).then(function(){
+                resolve()
+            })
+        })
+    }
+
 }
 
 export default Firestore

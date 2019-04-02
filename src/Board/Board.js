@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import './Board.css';
 
+//Firebase and routes
 import { withAuthorization } from '../Routes/Session';
-//For Testing
-import BoardClass from '../BasicClasses/Board/BoardClass';
 import { Firestore } from '../Firebase/Firestore';
 import firebase from 'firebase'
 import * as DB from '../Firebase/Firestore/DB';
@@ -12,6 +11,8 @@ import * as ROUTES from '../Routes/routes';
 import BoardFunctions from './BoardFunctions'
 //Tile UI Component
 import TileData from './TileData/TileData';
+//Unit Testing
+import BoardUnits from './BoardUnits';
 
 class Canvas extends Component {
     constructor(props) {
@@ -37,12 +38,14 @@ class Canvas extends Component {
         //Board Information
         this.rects = []
         this.tiles = []
+        //Units Information
+        this.BoardUnits = null
         //For Tile Selection
         this.selectionIndex = null
         //Get list of keys held down
         this.keysDown = []
         //Functions
-        this.boardFunctions = new BoardFunctions()
+        this.boardFunctions = new BoardFunctions(this.state.ctx,this.state.canvas)
     }
 
     componentDidMount(){
@@ -67,17 +70,23 @@ class Canvas extends Component {
         if(this.matchID===this.id){
             //retrive the matchInfo
             var matchInfo = await this.firestore.getBoardInformation(this.matchID)       
-            //sets the firestore json into a new BoardClass and updates it into this.state.board
-            var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
-            this.setState({board: boardReclassified})
-            //updates the size of the board to match the total size of all the rects in the canvas
-            this.updateWindowDimensions(this.state.board.size)
+        
             //inits the context and canvas refs
             this.setState(
                 {
                     ctx:this.refs.canvas.getContext('2d'),
                     canvas:this.refs.canvas
                 })
+            //creates the units on the board
+            this.BoardUnits = new BoardUnits(this.state.ctx,this.state.canvas,this.matchID,this.uid)
+            //reclassifies tiles
+            var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
+            //reclassifies units
+            boardReclassified = this.BoardUnits.reClassifyUnits(boardReclassified)
+            //sets board state
+            this.setState({board: boardReclassified})
+            //updates the size of the board to match the total size of all the rects in the canvas
+            this.updateWindowDimensions(this.state.board.size)
             //creates the boards
             this.boardCreation()
             //inits the tileSelection events
@@ -108,6 +117,7 @@ class Canvas extends Component {
                 if(doc.data() !== undefined){
                     //setting board state
                     var reclassedBoard = this.boardFunctions.reClassifyBoard(doc.data().board)
+                    reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
                     this.setState({board: reclassedBoard})
                     //rerunning board creation
                     this.boardCreation();
@@ -139,6 +149,8 @@ class Canvas extends Component {
             this.boardFunctions.rect(rectTile,this.size)
         }
         this.mapMovementEvents()
+        //Testing for unit creation on the board
+        this.BoardUnits.renderUnits(this.size,this.state.board.units)
     }
 
     tileSelect(){
