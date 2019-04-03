@@ -1,17 +1,49 @@
 #tileDataBox{
-    border: 1px solid black;
     position: fixed;
     width: 200px;
-    height: 100px;
+    height: 300px;
     background: white;
     opacity: .85;
     visibility: hidden;
+    
 }
+
+#topHeader{
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+#tileDataBox button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+#tileDataBox button:hover {
+    background-color: #ddd;
+  }
+  
+  /* Create an active/current tablink class */
+#tileDataBox button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+  }
 
 #clsBtn{
     position: absolute;
     left: 92%;
-    top: -5%;
+    top: -2%;
     font-size: 20px;
     cursor: pointer;
     height:auto;

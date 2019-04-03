@@ -16,8 +16,10 @@ export default class BoardFunctions{
     }
 
     withinTile(tile,x,y,size){
-        if(x >= tile.x && y >= tile.y){
-            if(x <= (tile.x+size) && y <= (tile.y+size)){
+        var relativeX = tile.position.x*size
+        var relativeY = tile.position.y*size
+        if(x >= relativeX && y >= relativeY){
+            if(x <= (relativeX+size) && y <= (relativeY+size)){
                 return true;
             }
         }
@@ -25,34 +27,9 @@ export default class BoardFunctions{
 
     //Creates and draws the rectangles within the canvas
     rect(props,size) {
-        const {ctx, x, y, stroke, border, image, imageSize} = props;
-
-        var img = new Image();
-            img.src = image;
-
+        const {ctx, x, y, color, stroke, border} = props;
         //creation
-        //coloring
-        ctx.beginPath()
-        //border
-        ctx.lineWidth=border;
-        ctx.strokeStyle=stroke;
-        ctx.strokeRect(x,y,size,size); 
-        ctx.drawImage(img,
-            0,
-            0,
-            imageSize,
-            imageSize,
-            x,
-            y,
-            size,
-            size
-        );
-        
-        
-
-        /* This is the older method and i'm not comfortable getting rid of it yet.
         ctx.rect(x,y,size,size);
-        ctx.drawImage(img, 0, 0, 300,300,x*size,y*size,size,size);
         //coloring
         ctx.beginPath()
         ctx.fillStyle=color;
@@ -61,7 +38,6 @@ export default class BoardFunctions{
         ctx.lineWidth=border;
         ctx.strokeStyle=stroke;
         ctx.strokeRect(x,y,size,size); 
-        */
     }
 
     //reclassifies the Board and all the tiles within it to the correct type of class object
@@ -72,7 +48,7 @@ export default class BoardFunctions{
         for(var i = 0;i<tiles.length;i++){
             var tile = tiles[i]
             for(var j = 0;j<this.tileTypes.length;j++){
-                if(tile.classType == new this.tileTypes[j]().classType){
+                if(tile.classType === new this.tileTypes[j]().classType){
                     board.addTile(new this.tileTypes[j](tile.position.x,tile.position.y))
                     break;
                 }

@@ -1,15 +1,12 @@
 export default class Unit{
 
-    constructor(ownerID,unitID,unitName,x,y,health){
+    constructor(ownerID,unitID,unitName,x,y){
         this.ownerID = ownerID;
         this.unitID = unitID;
         this.unitName = unitName;
         this.position = {
             x,
             y
-        }
-        this.stats = {
-            health
         }
     }
 

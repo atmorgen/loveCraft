@@ -54,13 +54,8 @@ export default class FertileSoil extends TileAbstract{
         this.image = input;
     }
 
-    getImage(){
-        return this.img;
-    }
-
     getImageSize(){
         return this.imgSize;
     }
-
 
 }

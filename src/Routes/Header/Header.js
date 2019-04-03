@@ -26,6 +26,7 @@ class Navigation extends Component {
                     username:retrievedUser
                 })
                 document.title = retrievedUser
+                localStorage.setItem('username',retrievedUser)
             }else{
                 this.setState({
                     username:null
@@ -77,7 +78,7 @@ class Navigation extends Component {
     render() { 
         return (  
             <React.Fragment>
-                <this.Navigation />
+                <this.Navigation/>
             </React.Fragment>
         );
     }

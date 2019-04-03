@@ -5,3 +5,8 @@
     border-width: 2px;
     border-color: maroon
 }
+
+#offCanvas{
+    height:0;
+    width:0;
+}

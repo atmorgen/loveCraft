@@ -1,5 +1,6 @@
 import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt'
 import { Firestore } from '../Firebase/Firestore';
+import _ from 'lodash';
 
 class BoardUnits{
     
@@ -12,7 +13,7 @@ class BoardUnits{
         this.matchdID = matchID
         this.uid = uid
         this.units = []
-        this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
+        //this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
 
         this.eldritchTypes = [
             EldritchGrunt
@@ -29,15 +30,19 @@ class BoardUnits{
 
     async unitCreation(unit,matchID){
         var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
-
         matchUnits.push({
             owner:unit.owner,
+            username:localStorage.getItem('username'),
             race:unit.race,
             name:unit.name,
             position:{
-                x:unit.positions.x,
-                y:unit.positions.y
-            }
+                x:unit.position.x,
+                y:unit.position.y
+            },
+            speed:unit.speed,
+            health:unit.health,
+            attack:unit.attack,
+            armor:unit.armor
         })
         this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
     }
@@ -62,6 +67,7 @@ class BoardUnits{
             }
 
         }
+        this.units = units;
         return board
     }
 
@@ -90,6 +96,17 @@ class BoardUnits{
         }, 1000);
     }
 
+    //finds the unit at the selected tile and returns it to board.js
+    getUnitAtSelectedTile(tile){
+        var position = {
+            x:tile.position.x,
+            y:tile.position.y
+        }
+        var unit = this.units.filter(unit =>
+            _.isEqual(unit.position,position)
+        )
+        return unit[0]
+    }
 
 }
  
