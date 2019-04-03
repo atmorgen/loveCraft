@@ -140,10 +140,11 @@ class Canvas extends Component {
             var rectTile = {
                 ctx:this.state.ctx, 
                 x:(this.size*tile.getPosition().x), 
-                y:(this.size*tile.getPosition().y), 
-                color:tile.color, 
+                y:(this.size*tile.getPosition().y),
                 stroke:strokeColor,
-                border:borderWidth
+                border:borderWidth,
+                image:tile.getImage(),
+                imageSize:tile.getImageSize()
             }
             this.rects.push(rectTile)
             this.boardFunctions.rect(rectTile,this.size)

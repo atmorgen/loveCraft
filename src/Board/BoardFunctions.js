@@ -25,9 +25,34 @@ export default class BoardFunctions{
 
     //Creates and draws the rectangles within the canvas
     rect(props,size) {
-        const {ctx, x, y, color, stroke, border} = props;
+        const {ctx, x, y, stroke, border, image, imageSize} = props;
+
+        var img = new Image();
+            img.src = image;
+
         //creation
+        //coloring
+        ctx.beginPath()
+        //border
+        ctx.lineWidth=border;
+        ctx.strokeStyle=stroke;
+        ctx.strokeRect(x,y,size,size); 
+        ctx.drawImage(img,
+            0,
+            0,
+            imageSize,
+            imageSize,
+            x,
+            y,
+            size,
+            size
+        );
+        
+        
+
+        /* This is the older method and i'm not comfortable getting rid of it yet.
         ctx.rect(x,y,size,size);
+        ctx.drawImage(img, 0, 0, 300,300,x*size,y*size,size,size);
         //coloring
         ctx.beginPath()
         ctx.fillStyle=color;
@@ -36,6 +61,7 @@ export default class BoardFunctions{
         ctx.lineWidth=border;
         ctx.strokeStyle=stroke;
         ctx.strokeRect(x,y,size,size); 
+        */
     }
 
     //reclassifies the Board and all the tiles within it to the correct type of class object

@@ -44,7 +44,6 @@ class BoardUnits{
 
     reClassifyUnits(board){
         var units = JSON.parse(board.units)
-        console.log(units)
         board.clearUnits()
         for(var i = 0;i<units.length;i++){
             var unit = units[i]

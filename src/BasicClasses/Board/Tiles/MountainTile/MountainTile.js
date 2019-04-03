@@ -1,4 +1,4 @@
-import TileAbstract from './TileAbstract'
+import TileAbstract from '../TileAbstract'
 
 export default class MountainTile extends TileAbstract{
     
@@ -6,6 +6,8 @@ export default class MountainTile extends TileAbstract{
         super(x,y)
         this.color = "gray";
         this.classType = 'Mountain';
+        this.img = null;
+        this.imgSize = null;
     }
 
     getColor(){
@@ -16,4 +18,11 @@ export default class MountainTile extends TileAbstract{
         this.color = input;
     }
 
+    getImage(){
+        return this.img;
+    }
+
+    getImageSize(){
+        return this.imgSize;
+    }
 }
