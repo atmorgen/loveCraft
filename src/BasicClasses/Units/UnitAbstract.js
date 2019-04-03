@@ -1,54 +1,15 @@
 export default class Unit{
 
-    constructor(ownerID,unitID,unitName,x,y){
-        this.ownerID = ownerID;
-        this.unitID = unitID;
-        this.unitName = unitName;
-        this.position = {
-            x,
-            y
-        }
+    constructor(){
+        this.unitUID = this.getRandomID()
     }
 
-    getOwnerID(){
-        return this.ownerID;
+    getRandomID(){
+        return '_' + Math.random().toString(36).substr(1, 11);
     }
 
-    setOwnerID(input){
-        this.ownerID = input;
-    }
-
-    getUnitID(){
-        return this.unitID;
-    }
-
-    setUnitID(input){
-        this.unitID = input;
-    }
-
-    getUnitName(){
-        return this.unitName;
-    }
-
-    setUnitName(input){
-        this.unitName = input;
-    }
-
-    getPosition(){
-        return this.position;
-    }
-
-    setPosition(x,y){
-        this.position.x = x;
-        this.position.y = y;
-    }
-
-    getStats(){
-        return this.stats;
-    }
-
-    setStats(input){
-        this.stats = input;
+    getUnitUID(){
+        return this.unitUID;
     }
 
 }

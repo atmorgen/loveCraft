@@ -30,8 +30,6 @@ export default class TileAbstract{
                 this.position.y*size,
                 size,
                 size
-            );
-        
-        
+            ); 
     }
 }

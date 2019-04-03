@@ -1,7 +1,7 @@
 #tileDataBox{
     position: fixed;
     width: 200px;
-    height: 300px;
+    height: auto;
     background: white;
     opacity: .85;
     visibility: hidden;
@@ -48,4 +48,16 @@
     cursor: pointer;
     height:auto;
     width:auto;
+}
+
+#Unit{
+    line-height: .5;
+}
+
+#raceTag{
+    font-size: 12px;
+}
+
+#Tile{
+    line-height: .5;
 }

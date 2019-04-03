@@ -11,6 +11,10 @@ export default class MountainTile extends TileAbstract{
         this.imgSize = 480;
     }
 
+    getClassType(){
+        return this.classType
+    }
+
     getColor(){
         return this.color;
     }

@@ -14,6 +14,10 @@ export default class FertileSoil extends TileAbstract{
         this.imgSize = 240;
     }
 
+    getClassType(){
+        return this.classType
+    }
+
     getFertility(){
         return this.fertility;
     }

@@ -11,6 +11,10 @@ export default class WaterTile extends TileAbstract{
         this.imgSize = 240;
     }
 
+    getClassType(){
+        return this.classType
+    }
+
     getImage(){
         return this.img;
     }

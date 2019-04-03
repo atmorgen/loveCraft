@@ -31,7 +31,6 @@ export default class BoardFunctions{
         //creation
         ctx.rect(x,y,size,size);
         //coloring
-        ctx.beginPath()
         ctx.fillStyle=color;
         ctx.fillRect(x,y,size,size);
         //border
@@ -55,5 +54,28 @@ export default class BoardFunctions{
             }
         }
         return board
+    }
+
+    //returns whether or not a tile is within moveable range of the selected unit
+    isMoveable(i,selectedIndex,selectedUnit,boardSize){
+        var moveable = false
+        if(selectedUnit){
+            if(selectedUnit.username === localStorage.getItem('username')){
+                //left and right
+                
+                if(i>=selectedIndex-selectedUnit.speed && i<=selectedIndex+selectedUnit.speed){
+                    moveable=true
+                }
+                //above
+                if(i===selectedIndex-boardSize || i===selectedIndex-(boardSize*2)){
+                    moveable=true
+                }
+                //below
+                if(i===selectedIndex+boardSize || i === selectedIndex+(boardSize*2)){
+                    moveable=true
+                }
+            }
+        }
+        return moveable
     }
 }

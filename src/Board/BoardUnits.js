@@ -18,6 +18,14 @@ class BoardUnits{
         this.eldritchTypes = [
             EldritchGrunt
         ]
+
+        this.humanTypes = [
+
+        ]
+
+        this.druidTypes = [
+
+        ]
     }
     
     renderUnits(size,units){
@@ -31,6 +39,7 @@ class BoardUnits{
     async unitCreation(unit,matchID){
         var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
         matchUnits.push({
+            unitUID:unit.unitUID,
             owner:unit.owner,
             username:localStorage.getItem('username'),
             race:unit.race,
@@ -61,14 +70,39 @@ class BoardUnits{
                     }
                 }
             }else if(unit.race === "Human"){
-
-            }else{
-
+                for(j = 0;j<this.humanTypes.length;j++){
+                    if(this.humanTypes[j].name === unit.name.replace(/\s/g,'')){
+                        board.addUnit(new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                        break;
+                    }
+                }
+            }else if(unit.race === "Druid"){
+                for(j = 0;j<this.druidTypes.length;j++){
+                    if(this.druidTypes[j].name === unit.name.replace(/\s/g,'')){
+                        board.addUnit(new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                        break;
+                    }
+                }
             }
 
         }
         this.units = units;
         return board
+    }
+
+    async moveUnit(matchID,unit,x,y){
+        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
+        var position = {
+            x:x,
+            y:y
+        }
+        var correctUnit = matchUnits.filter(x =>
+            x.unitUID === unit.unitUID
+        )
+        correctUnit[0].position.x = x
+        correctUnit[0].position.y = y
+
+        this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
     }
 
     moveImage(unit,x,y,stepsTop){

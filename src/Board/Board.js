@@ -34,7 +34,6 @@ class Canvas extends Component {
         this.uid=null
         //Board Information
         this.rects = []
-        this.tiles = []
         //Units Information
         this.BoardUnits = null
         //For Tile Selection
@@ -124,16 +123,72 @@ class Canvas extends Component {
             })
     }
 
+    tileSelect(){
+        // eslint-disable-next-line
+        this.state.canvas.onmousedown = (e)=>{
+            var clientRect = this.state.canvas.getBoundingClientRect(),
+            x = e.clientX - clientRect.left,
+            y = e.clientY - clientRect.top
+            for(var i = 0;i<this.state.board.tiles.length;i++){
+                var rect = this.state.board.tiles[i];
+                
+                if(this.boardFunctions.withinTile(rect,x,y,this.size)) {
+                    this.selectionIndex = i;
+                    break;
+                }  
+            }
+
+            this.setState({
+                selectedTile:this.state.board.tiles[i]
+            })
+
+            //if unit is selected
+            if(this.state.selectedUnit){
+                //if it is your unit
+                if(this.state.selectedUnit.username === localStorage.getItem('username')){
+                    //if the tile you're trying to move to is within range
+                    if(this.state.selectedTile.isMoveable){
+                        //if the tile you're trying to move to isn't water
+                        if(this.state.selectedTile.getClassType() !== "Water"){
+                            this.makeMove()
+                        }
+                    }
+                }
+            }
+
+            this.setState({
+                selectedUnit:this.BoardUnits.getUnitAtSelectedTile(this.state.board.tiles[i])
+            })
+            this.boardCreation()
+        }
+    }
+
+    makeMove(){
+        var tileToMoveTo = this.state.selectedTile
+        this.BoardUnits.moveUnit(this.matchID,this.state.selectedUnit,tileToMoveTo.getPosition().x,tileToMoveTo.getPosition().y)
+    }
+
     //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
-        this.tiles = this.state.board.tiles
         this.rects = []
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        for(var i = 0;i<this.tiles.length;i++){
-            var tile = this.tiles[i]
-            //console.log(tile.getPosition().x,tile.getPosition().y,tile)
-            var strokeColor = this.selectionIndex === i ? 'red':'black';
-            var borderWidth = this.selectionIndex === i ? 4:.5;
+        for(var i = 0;i<this.state.board.tiles.length;i++){
+            var tile = this.state.board.tiles[i]
+            tile.isMoveable=false
+            
+            var strokeColor,
+                borderWidth
+            
+            if(this.selectionIndex === i){
+                strokeColor = 'red'
+                borderWidth = 4
+            }else{
+                var isMoveable = this.isMoveable(i)
+                strokeColor = isMoveable ? 'yellow' : 'black'
+                borderWidth = isMoveable ? 2 : .5
+            }
+            
+
             var rectTile = {
                 ctx:this.state.ctx, 
                 x:(this.size*tile.getPosition().x), 
@@ -150,42 +205,29 @@ class Canvas extends Component {
         this.BoardUnits.renderUnits(this.size,this.state.board.units)
     }
 
-    /*
-    boardCreation(){
-        this.tiles = this.state.board.tiles
-        this.rects = []
-        this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        for(var i = 0;i<this.tiles.length;i++){
-            var tile = this.tiles[i]
-            var highlight = this.selectionIndex === i ?true:false
-            tile.drawImage(highlight,this.size,this.state.ctx,this.state.canvas)
-        }
-        this.mapMovementEvents()
-        //Testing for unit creation on the board
-        this.BoardUnits.renderUnits(this.size,this.state.board.units)
-    }
-    */
-
-    tileSelect(){
-        // eslint-disable-next-line
-        this.state.canvas.onmousedown = (e)=>{
-            var clientRect = this.state.canvas.getBoundingClientRect(),
-            x = e.clientX - clientRect.left,
-            y = e.clientY - clientRect.top
-            for(var i = 0;i<this.state.board.tiles.length;i++){
-                var rect = this.state.board.tiles[i];
-                
-                if(this.boardFunctions.withinTile(rect,x,y,this.size)) {
-                    this.selectionIndex = i;
-                    break;
-                }  
+    //returns whether or not a tile is within moveable range of the selected unit
+    isMoveable(i){
+        var moveable = false
+        if(this.state.selectedUnit){
+            if(this.state.selectedUnit.username === localStorage.getItem('username')){
+                //left and right
+                if(i>=this.selectionIndex-this.state.selectedUnit.speed && i<=this.selectionIndex+this.state.selectedUnit.speed){
+                    this.state.board.tiles[i].isMoveable = true
+                    moveable=true
+                }
+                //above
+                if(i===this.selectionIndex-this.state.board.size || i===this.selectionIndex-(this.state.board.size*2)){
+                    this.state.board.tiles[i].isMoveable = true
+                    moveable=true
+                }
+                //below
+                if(i===this.selectionIndex+this.state.board.size || i === this.selectionIndex+(this.state.board.size*2)){
+                    this.state.board.tiles[i].isMoveable = true
+                    moveable=true
+                }
             }
-            this.boardCreation()
-            this.setState({
-                selectedTile:this.tiles[i],
-                selectedUnit:this.BoardUnits.getUnitAtSelectedTile(this.tiles[i])
-            })
         }
+        return moveable
     }
 
      updateWindowDimensions(input) {

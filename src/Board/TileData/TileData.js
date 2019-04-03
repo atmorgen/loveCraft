@@ -53,7 +53,8 @@ class TileData extends Component {
 
     closeBox(){
         var tileBox = document.getElementById('tileDataBox')
-        tileBox.style.visibility = 'hidden' 
+        tileBox.style.visibility = 'hidden'
+        document.getElementById('unitTab').style.visibility = 'hidden'
     }
 
     renderTileData(){
@@ -75,7 +76,7 @@ class TileData extends Component {
                 })
             }
         }
-        
+
         if(unit){
             unitTab.style.visibility = 'visible'
             var unitDataNew = {
@@ -88,7 +89,8 @@ class TileData extends Component {
                 //armor info
                 unitArmorMin:unit.armor.min,
                 unitArmorMax:unit.armor.max,
-                unitHealth:unit.health
+                unitHealth:unit.health,
+                unitSpeed:unit.speed
             }
 
             if(!_.isEqual(this.state.unitData,unitDataNew)){
@@ -156,12 +158,14 @@ class TileData extends Component {
                 </div>
 
                 <div id="Unit" className="tabcontent">
-                    <h3>{this.state.unitData.unitName}</h3>
                     <h5>Owner: {this.state.unitData.unitOwner}</h5>
-                    <p>Race: {this.state.unitData.unitRace}</p> 
+                    <h3 id='unitName'>{this.state.unitData.unitName}</h3>
+                    
+                    <div id='raceTag'>Race: {this.state.unitData.unitRace}</div> 
                     <p>Health: {this.state.unitData.unitHealth}</p>
                     <p>Attack: {this.state.unitData.unitAttackMin} - {this.state.unitData.unitAttackMax}</p>
                     <p>Armor: {this.state.unitData.unitArmorMin} - {this.state.unitData.unitArmorMax}</p>
+                    <p>Speed: {this.state.unitData.unitSpeed}</p>
                 </div>
             </div>
         );

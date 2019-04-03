@@ -1,8 +1,9 @@
 import BigCthuluSprite from './big_cthulu.png'
+import UnitAbstract from '../../../UnitAbstract'
 
-class EldritchGrunt{
+class EldritchGrunt extends UnitAbstract{
     constructor(uid,size,x,y,context,canvas){
-
+        super()
         //////This is the units game information
         this.owner = uid
         this.name = "Eldritch Grunt"
@@ -64,8 +65,8 @@ class EldritchGrunt{
                 this.pixelsTop,
                 this.spriteWidth,
                 this.spriteHeight,
-                this.position.x*this.state.size,
-                this.position.y*this.state.size,
+                this.position.x*this.state.size + this.state.size*.1,
+                this.position.y*this.state.size + this.state.size*.1,
                 this.state.size*.8,
                 this.state.size*.8
             );

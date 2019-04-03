@@ -11,6 +11,10 @@ export default class ForestTile extends TileAbstract{
         this.imgSize = 1300;
     }
 
+    getClassType(){
+        return this.classType
+    }
+
     getColor(){
         return this.color;
     }
