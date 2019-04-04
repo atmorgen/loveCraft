@@ -2,6 +2,12 @@ import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/Eldritch
 import { Firestore } from '../Firebase/Firestore';
 import _ from 'lodash';
 
+import TileData from './TileData/TileData';
+
+//For move submission
+import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
+import Move from '../BasicClasses/Match/Move';
+
 class BoardUnits{
     
     constructor(context,canvas,matchID,uid){
@@ -13,7 +19,10 @@ class BoardUnits{
         this.matchdID = matchID
         this.uid = uid
         this.units = []
-        //this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
+        this.tileData = new TileData()
+        //for move submissions
+        this.turnSubmission = new TurnSubmission()
+        this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
 
         this.eldritchTypes = [
             EldritchGrunt
@@ -98,7 +107,19 @@ class BoardUnits{
         correctUnit[0].position.x = x
         correctUnit[0].position.y = y
 
-        this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
+        //await this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
+
+        if(this.turnSubmission.getMoves().length<3){
+            this.turnSubmission.addMove(new Move(correctUnit[0],x,y))
+        }else{
+            console.log('already submitted 3 moves!')
+        }
+        this.tileData.closeBox()
+    }
+
+    //submits turn to the server
+    submitTurn(){
+        this.turnSubmission.submitTurn(this.matchdID,this.uid)
     }
 
     moveImage(unit,x,y,stepsTop){

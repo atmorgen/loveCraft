@@ -1,5 +1,5 @@
 import TileAbstract from '../TileAbstract'
-import forestImage from './ForestTile.jpg'
+import forestImage from './tempForest.png'
 
 export default class ForestTile extends TileAbstract{
     
@@ -8,7 +8,7 @@ export default class ForestTile extends TileAbstract{
         this.color = "darkgreen";
         this.classType = 'Forest';
         this.img = forestImage;
-        this.imgSize = 1300;
+        this.imgSize = 256;
     }
 
     getClassType(){

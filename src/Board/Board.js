@@ -26,7 +26,8 @@ class Canvas extends Component {
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.tileSelect = this.tileSelect.bind(this);
-        this.leaveMatch = this.leaveMatch.bind(this)
+        this.leaveMatch = this.leaveMatch.bind(this);
+        this.submitTurn = this.submitTurn.bind(this)
         //Firestore
         this.firestore = new Firestore()
         this.id = this.props.match.params.gameID;
@@ -167,6 +168,8 @@ class Canvas extends Component {
                     if(this.state.selectedTile.getClassType() !== "Water"){
                         this.makeMove()
                     }
+                }else{
+                    this.clearMoveable()
                 }
             }
             
@@ -188,6 +191,10 @@ class Canvas extends Component {
         this.BoardUnits.moveUnit(this.matchID,this.state.selectedUnit,tileToMoveTo.getPosition().x,tileToMoveTo.getPosition().y)
     }
 
+    submitTurn(){
+        this.BoardUnits.submitTurn()
+    }
+
     //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
         this.rects = []
@@ -201,7 +208,6 @@ class Canvas extends Component {
 
     //returns whether or not a tile is within moveable range of the selected unit
     isMoveable(){
-        this.isUnitSelected = true
         for(var i = 0;i<this.state.board.tiles.length;i++){
             var tile = this.state.board.tiles[i]
             tile.isMoveable=false
@@ -239,6 +245,12 @@ class Canvas extends Component {
                 }
             }
         }     
+    }
+
+    clearMoveable(){
+        for(var i = 0;i<this.state.board.tiles.length;i++){
+            this.state.board.tiles[i].isMoveable=false
+        }
     }
 
      updateWindowDimensions(input) {
@@ -300,6 +312,7 @@ class Canvas extends Component {
                 <button onClick={this.leaveMatch}>Leave Match</button>
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <button onClick={this.submitTurn} id='submitButton'>Submit</button>
                 <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} size={this.size} />
             </React.Fragment>
         )
