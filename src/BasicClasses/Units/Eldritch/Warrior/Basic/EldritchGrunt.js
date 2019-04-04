@@ -55,24 +55,7 @@ class EldritchGrunt extends UnitAbstract{
         this.owner = input
     }
 
-    drawImage(){
-        var img = new Image();
-            img.src = this.img;
-        
-        img.onload = () =>{
-            this.context.drawImage(img,
-                this.pixelsLeft,
-                this.pixelsTop,
-                this.spriteWidth,
-                this.spriteHeight,
-                this.position.x*this.state.size + this.state.size*.1,
-                this.position.y*this.state.size + this.state.size*.1,
-                this.state.size*.8,
-                this.state.size*.8
-            );
-        }
-        
-    }
+    
 
     getImage(){
         return this.img

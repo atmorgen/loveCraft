@@ -3,3 +3,4 @@ export const BOARD = 'Board';
 export const USERS = 'Users';
 export const MATCHMAKING = 'Matchmaking';
 export const MATCHES = 'Matches';
+export const UNITS = 'Units';

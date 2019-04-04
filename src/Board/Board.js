@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Board.css';
+import _ from 'lodash';
 
 //Firebase and routes
 import { withAuthorization } from '../Routes/Session';
@@ -41,7 +42,7 @@ class Canvas extends Component {
         //Get list of keys held down
         this.keysDown = []
         //Functions
-        this.boardFunctions = new BoardFunctions(this.state.ctx,this.state.canvas)
+        this.boardFunctions = null
     }
 
     componentDidMount(){
@@ -69,16 +70,23 @@ class Canvas extends Component {
         
             //inits the context and canvas refs
             this.setState(
-                {
-                    ctx:this.refs.canvas.getContext('2d', { alpha: false }),
-                    canvas:this.refs.canvas
+                {   
+                    tileCanvas:{
+                        ctx:this.refs.tileCanvas.getContext('2d'),
+                        canvas:this.refs.tileCanvas
+                    },
+                    unitCanvas:{
+                        ctx:this.refs.unitCanvas.getContext('2d'),
+                        canvas:this.refs.unitCanvas
+                    }                    
                 })
+            this.boardFunctions = new BoardFunctions(this.state.tileCanvas.ctx,this.state.tileCanvas.canvas)
             //creates the units on the board
-            this.BoardUnits = new BoardUnits(this.state.ctx,this.state.canvas,this.matchID,this.uid)
+            this.BoardUnits = new BoardUnits(this.state.unitCanvas.ctx,this.state.unitCanvas.canvas,this.matchID,this.uid)
             //reclassifies tiles
             var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
             //reclassifies units
-            boardReclassified = this.BoardUnits.reClassifyUnits(boardReclassified)
+            //boardReclassified = this.BoardUnits.reClassifyUnits(boardReclassified)
             //sets board state
             this.setState({board: boardReclassified})
             //updates the size of the board to match the total size of all the rects in the canvas
@@ -88,7 +96,7 @@ class Canvas extends Component {
             //inits the tileSelection events
             this.tileSelect();
             //Sets subscription events for rest of the match
-            this.boardSubscription()
+            this.gameSubscription()
         //else redirect the user to the correct matchID url
         }else{
             window.location.href=`..${ROUTES.GAMEPAGE}/${this.matchID}`
@@ -107,16 +115,27 @@ class Canvas extends Component {
     }
 
     //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
-    boardSubscription(){
+    gameSubscription(){
         this.db.collection(DB.MATCHES).doc(this.id)
             .onSnapshot((doc)=>{
                 if(doc.data() !== undefined){
-                    //setting board state
+                    //reclassing the tiles
                     var reclassedBoard = this.boardFunctions.reClassifyBoard(doc.data().board)
+                    //reclassing the units
                     reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
+
+                    //if the tiles have changed in any way
+                    if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
+                        console.log('tiles changed')
+                        //rerunning board creation
+                        this.boardCreation();
+                    }
+                    //if the units have changed in any way
+                    if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
+                        console.log('units changed')
+                        this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
+                    }
                     this.setState({board: reclassedBoard})
-                    //rerunning board creation
-                    this.boardCreation();
                 }else{
                     this.leaveMatch()
                 }
@@ -125,8 +144,8 @@ class Canvas extends Component {
 
     tileSelect(){
         // eslint-disable-next-line
-        this.state.canvas.onmousedown = (e)=>{
-            var clientRect = this.state.canvas.getBoundingClientRect(),
+        this.state.tileCanvas.canvas.onmousedown = (e)=>{
+            var clientRect = this.state.tileCanvas.canvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top
             for(var i = 0;i<this.state.board.tiles.length;i++){
@@ -171,7 +190,7 @@ class Canvas extends Component {
     //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
         this.rects = []
-        this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
+        this.state.tileCanvas.ctx.clearRect(0, 0, this.state.tileCanvas.canvas.width, this.state.tileCanvas.canvas.height);
         for(var i = 0;i<this.state.board.tiles.length;i++){
             var tile = this.state.board.tiles[i]
             tile.isMoveable=false
@@ -190,7 +209,7 @@ class Canvas extends Component {
             
 
             var rectTile = {
-                ctx:this.state.ctx, 
+                ctx:this.state.tileCanvas.ctx, 
                 x:(this.size*tile.getPosition().x), 
                 y:(this.size*tile.getPosition().y), 
                 color:tile.color, 
@@ -202,7 +221,7 @@ class Canvas extends Component {
         }
         this.mapMovementEvents()
         //Testing for unit creation on the board
-        this.BoardUnits.renderUnits(this.size,this.state.board.units)
+        //this.BoardUnits.renderUnits(this.size,this.state.board.units)
     }
 
     //returns whether or not a tile is within moveable range of the selected unit
@@ -254,16 +273,16 @@ class Canvas extends Component {
         }
         */
         // eslint-disable-next-line
-        this.state.canvas.onkeydown = (e) =>{
+        this.state.tileCanvas.canvas.onkeydown = (e) =>{
             if(this.keysDown.indexOf(e.key)===-1) this.keysDown.push(e.key)
         }
         // eslint-disable-next-line
-        this.state.canvas.onkeyup = (e) =>{
+        this.state.tileCanvas.canvas.onkeyup = (e) =>{
             this.keysDown.splice(this.keysDown.indexOf(e.key),1)
         }
         
         // eslint-disable-next-line
-        this.state.canvas.tabIndex = 1000;
+        this.state.tileCanvas.canvas.tabIndex = 1000;
         setInterval(() => {
             var scrollX = window.scrollX
             var scrollY = window.scrollY
@@ -287,7 +306,8 @@ class Canvas extends Component {
             <React.Fragment>
                 <div>ID: {this.props.match.params.gameID}</div>
                 <button onClick={this.leaveMatch}>Leave Match</button>
-                <canvas id='canvasBoard' ref='canvas' width={this.state.width} height={this.state.height}></canvas>
+                <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} size={this.size} />
             </React.Fragment>
         )

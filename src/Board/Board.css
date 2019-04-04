@@ -1,9 +1,20 @@
-#canvasBoard{
+#canvasBoardTile{
     position: absolute;
     margin: 50px;
     border-style: solid;
     border-width: 2px;
-    border-color: maroon
+    border-color: maroon;
+    z-index: -1;
+}
+
+#canvasBoardUnit{
+    position: absolute;
+    margin: 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: maroon;
+    background-color: transparent;
+    pointer-events:none;
 }
 
 #offCanvas{

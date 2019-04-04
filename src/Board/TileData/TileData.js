@@ -27,7 +27,7 @@ class TileData extends Component {
     }
 
     mouseEvents(){
-        var canvas = document.getElementById('canvasBoard')
+        var canvas = document.getElementById('canvasBoardTile')
         canvas.addEventListener('mousedown',(e)=>{
             this.getMousePos(e)
         })

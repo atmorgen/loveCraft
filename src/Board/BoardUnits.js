@@ -29,11 +29,11 @@ class BoardUnits{
     }
     
     renderUnits(size,units){
+        this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
         for(var i = 0;i<units.length;i++){
             units[i].state.size = size
             units[i].drawImage()
-        }
-        
+        } 
     }
 
     async unitCreation(unit,matchID){
