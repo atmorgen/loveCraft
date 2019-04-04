@@ -43,8 +43,6 @@ class Canvas extends Component {
         this.keysDown = []
         //Functions
         this.boardFunctions = null
-        //is unit to move
-        this.movingUnit = null
     }
 
     componentDidMount(){
@@ -128,13 +126,12 @@ class Canvas extends Component {
 
                     //if the tiles have changed in any way
                     if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
-                        console.log('tiles changed')
                         //rerunning board creation
                         this.boardCreation();
                     }
                     //if the units have changed in any way
                     if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
-                        console.log('units changed')
+                        //re-rendering units
                         this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
                     }
                     this.setState({board: reclassedBoard})
@@ -160,8 +157,6 @@ class Canvas extends Component {
                     break;
                 }  
             }
-
-            
             
             this.setState({
                 selectedTile:this.state.board.tiles[i]
@@ -170,8 +165,6 @@ class Canvas extends Component {
             if(this.state.selectedTile){
                 if(this.state.selectedTile.isMoveable){
                     if(this.state.selectedTile.getClassType() !== "Water"){
-                        
-                        //this.resetMoveable()
                         this.makeMove()
                     }
                 }
@@ -187,33 +180,6 @@ class Canvas extends Component {
                     this.movingUnit = this.state.selectedUnit
                 }
             }
-
-            
-
-            
-
-            
-            
-            
-
-            /*
-            //if unit is selected
-            if(this.state.selectedUnit){
-                this.isMoveable()
-                //if it is your unit
-                if(this.state.selectedUnit.username === localStorage.getItem('username')){
-                    //if the tile you're trying to move to is within range
-                    if(this.state.selectedTile.isMoveable){
-                        //if the tile you're trying to move to isn't water
-                        if(this.state.selectedTile.getClassType() !== "Water"){
-                            this.makeMove()
-                        }
-                    }
-                }
-            }
-            */
-            
-            //this.boardCreation()
         }
     }
 
@@ -228,44 +194,13 @@ class Canvas extends Component {
         this.state.tileCanvas.ctx.clearRect(0, 0, this.state.tileCanvas.canvas.width, this.state.tileCanvas.canvas.height);
         for(var i = 0;i<this.state.board.tiles.length;i++){
             var tile = this.state.board.tiles[i]
-            tile.isMoveable=false
-            
-            /*
-            var strokeColor,
-                borderWidth
-            
-            if(this.selectionIndex === i){
-                strokeColor = 'red'
-                borderWidth = 4
-            }else{
-                var isMoveable = this.isMoveable(i)
-                strokeColor = isMoveable ? 'yellow' : 'black'
-                borderWidth = isMoveable ? 2 : .5
-            }
-            */
             tile.drawImg(false,this.size,this.state.tileCanvas.ctx)
-            
-            /*
-            var rectTile = {
-                ctx:this.state.tileCanvas.ctx, 
-                x:(this.size*tile.getPosition().x), 
-                y:(this.size*tile.getPosition().y), 
-                color:tile.color, 
-                stroke:strokeColor,
-                border:borderWidth
-            }
-            this.rects.push(rectTile)
-            this.boardFunctions.rect(rectTile,this.size)
-            */
         }
         this.mapMovementEvents()
-        //Testing for unit creation on the board
-        //this.BoardUnits.renderUnits(this.size,this.state.board.units)
     }
 
     //returns whether or not a tile is within moveable range of the selected unit
     isMoveable(){
-        
         this.isUnitSelected = true
         for(var i = 0;i<this.state.board.tiles.length;i++){
             var tile = this.state.board.tiles[i]
@@ -276,24 +211,34 @@ class Canvas extends Component {
                     this.state.board.tiles[i].isMoveable = true
                     this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
                 }
-                //above
-                if(i===this.selectionIndex-this.state.board.size || i===this.selectionIndex-(this.state.board.size*2)){
-                    this.state.board.tiles[i].isMoveable = true
-                    this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
+                //have to loop through the top and bottom tiles because they are not iterative indexes
+                for(var j = 1;j<=this.state.selectedUnit.speed;j++){
+                    //above
+                    if(i===this.selectionIndex-(this.state.board.size*j)){
+                        this.state.board.tiles[i].isMoveable = true
+                        this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
+                    }
+                    //below
+                    if(i===this.selectionIndex+(this.state.board.size*j)){
+                        this.state.board.tiles[i].isMoveable = true
+                        this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
+                    }
+                    //prevents it from boxing
+                    if(j!=this.state.selectedUnit.speed){
+                        //top left                                                //top right
+                        if(i===this.selectionIndex-(this.state.board.size*j)-1 || i===this.selectionIndex-(this.state.board.size*j)+1){
+                            this.state.board.tiles[i].isMoveable = true
+                            this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
+                        }
+                        //bottom left                                             //bottom right
+                        if(i===this.selectionIndex+(this.state.board.size*j)-1 || i===this.selectionIndex+(this.state.board.size*j)+1){
+                            this.state.board.tiles[i].isMoveable = true
+                            this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
+                        }
+                    }
                 }
-                //below
-                if(i===this.selectionIndex+this.state.board.size || i === this.selectionIndex+(this.state.board.size*2)){
-                    this.state.board.tiles[i].isMoveable = true
-                    this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
-                }
-            }  
-        }   
-    }
-
-    resetMoveable(){
-        for(var i = 0;i<this.state.board.tiles.length;i++){
-            this.state.board.tiles[i].isMoveable = false;
-        }
+            }
+        }     
     }
 
      updateWindowDimensions(input) {
