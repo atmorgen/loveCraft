@@ -92,10 +92,6 @@ class BoardUnits{
 
     async moveUnit(matchID,unit,x,y){
         var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
-        var position = {
-            x:x,
-            y:y
-        }
         var correctUnit = matchUnits.filter(x =>
             x.unitUID === unit.unitUID
         )
