@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './Board.css';
+import _ from 'lodash';
 
 //Firebase and routes
 import { withAuthorization } from '../Routes/Session';
@@ -11,33 +12,35 @@ import * as ROUTES from '../Routes/routes';
 import BoardFunctions from './BoardFunctions'
 //Tile UI Component
 import TileData from './TileData/TileData';
-//Unit Testing
+//Unit Functions
 import BoardUnits from './BoardUnits';
+//Move Classes
+import Move from '../BasicClasses/Match/Move';
+import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
 
 class Canvas extends Component {
     constructor(props) {
         super(props);
+        //width and height of the board
         this.state = { 
             width: 0, 
-            height: 0,
-            canvas:null,
-            ctx: null,
-            selectedTile: null
+            height: 0
         }
-        this.size = 35;
+        //tile size
+        this.size = 80;
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.tileSelect = this.tileSelect.bind(this);
-        this.leaveMatch = this.leaveMatch.bind(this)
+        this.leaveMatch = this.leaveMatch.bind(this);
+        this.submitTurn = this.submitTurn.bind(this);
+        this.submitHandler = this.submitHandler.bind(this);
+        this.removalHandler = this.removalHandler.bind(this);
         //Firestore
         this.firestore = new Firestore()
         this.id = this.props.match.params.gameID;
         this.db = firebase.firestore()
         this.matchID=null
         this.uid=null
-        //Board Information
-        this.rects = []
-        this.tiles = []
         //Units Information
         this.BoardUnits = null
         //For Tile Selection
@@ -45,7 +48,9 @@ class Canvas extends Component {
         //Get list of keys held down
         this.keysDown = []
         //Functions
-        this.boardFunctions = new BoardFunctions(this.state.ctx,this.state.canvas)
+        this.boardFunctions = null
+        //for submitting a turn
+        this.turnSubmission = new TurnSubmission()
     }
 
     componentDidMount(){
@@ -73,16 +78,23 @@ class Canvas extends Component {
         
             //inits the context and canvas refs
             this.setState(
-                {
-                    ctx:this.refs.canvas.getContext('2d'),
-                    canvas:this.refs.canvas
+                {   
+                    tileCanvas:{
+                        ctx:this.refs.tileCanvas.getContext('2d'),
+                        canvas:this.refs.tileCanvas
+                    },
+                    unitCanvas:{
+                        ctx:this.refs.unitCanvas.getContext('2d'),
+                        canvas:this.refs.unitCanvas
+                    }                   
                 })
+            this.boardFunctions = new BoardFunctions(this.state.tileCanvas.ctx,this.state.tileCanvas.canvas)
             //creates the units on the board
-            this.BoardUnits = new BoardUnits(this.state.ctx,this.state.canvas,this.matchID,this.uid)
+            this.BoardUnits = new BoardUnits(this.state.unitCanvas.ctx,this.state.unitCanvas.canvas,this.matchID,this.uid)
             //reclassifies tiles
             var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
             //reclassifies units
-            boardReclassified = this.BoardUnits.reClassifyUnits(boardReclassified)
+            //boardReclassified = this.BoardUnits.reClassifyUnits(boardReclassified)
             //sets board state
             this.setState({board: boardReclassified})
             //updates the size of the board to match the total size of all the rects in the canvas
@@ -92,7 +104,7 @@ class Canvas extends Component {
             //inits the tileSelection events
             this.tileSelect();
             //Sets subscription events for rest of the match
-            this.boardSubscription()
+            this.gameSubscription()
         //else redirect the user to the correct matchID url
         }else{
             window.location.href=`..${ROUTES.GAMEPAGE}/${this.matchID}`
@@ -111,16 +123,26 @@ class Canvas extends Component {
     }
 
     //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
-    boardSubscription(){
+    gameSubscription(){
         this.db.collection(DB.MATCHES).doc(this.id)
             .onSnapshot((doc)=>{
                 if(doc.data() !== undefined){
-                    //setting board state
+                    //reclassing the tiles
                     var reclassedBoard = this.boardFunctions.reClassifyBoard(doc.data().board)
+                    //reclassing the units
                     reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
+
+                    //if the tiles have changed in any way
+                    if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
+                        //rerunning board creation
+                        this.boardCreation();
+                    }
+                    //if the units have changed in any way
+                    if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
+                        //re-rendering units
+                        this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
+                    }
                     this.setState({board: reclassedBoard})
-                    //rerunning board creation
-                    this.boardCreation();
                 }else{
                     this.leaveMatch()
                 }
@@ -129,107 +151,146 @@ class Canvas extends Component {
 
     //Responsible for redrawing the rectangles each time there is an update
     boardCreation(){
-        this.tiles = this.state.board.tiles
-        this.rects = []
-        this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        for(var i = 0;i<this.tiles.length;i++){
-            var tile = this.tiles[i]
-            //console.log(tile.getPosition().x,tile.getPosition().y,tile)
-            var strokeColor = this.selectionIndex === i ? 'red':'black';
-            var borderWidth = this.selectionIndex === i ? 4:.5;
-            var rectTile = {
-                ctx:this.state.ctx, 
-                x:(this.size*tile.getPosition().x), 
-                y:(this.size*tile.getPosition().y), 
-                color:tile.color, 
-                stroke:strokeColor,
-                border:borderWidth
-            }
-            this.rects.push(rectTile)
-            this.boardFunctions.rect(rectTile,this.size)
+        this.state.tileCanvas.ctx.clearRect(0, 0, this.state.tileCanvas.canvas.width, this.state.tileCanvas.canvas.height);
+        for(var i = 0;i<this.state.board.tiles.length;i++){
+            var tile = this.state.board.tiles[i]
+            tile.drawImg(false,this.size,this.state.tileCanvas.ctx)
         }
-        this.mapMovementEvents()
-        //Testing for unit creation on the board
-        this.BoardUnits.renderUnits(this.size,this.state.board.units)
     }
 
     tileSelect(){
+        var tileMoves = 0,
+            targetIndex,
+            tile,
+            move;
         // eslint-disable-next-line
-        this.state.canvas.onmousedown= (e)=>{
-            var clientRect = this.state.canvas.getBoundingClientRect(),
+        this.state.tileCanvas.canvas.onmousedown = (e)=>{
+
+            var clientRect = this.state.tileCanvas.canvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
-            y = e.clientY - clientRect.top
-            for(var i = 0;i<this.rects.length;i++){
-                var rect = this.rects[i];
-                if(this.boardFunctions.withinTile(rect,x,y,this.size)) {
+            y = e.clientY - clientRect.top,
+            i;
+            for(i = 0;i<this.state.board.tiles.length;i++){
+                tile = this.state.board.tiles[i];
+                
+                if(this.boardFunctions.withinTile(tile,x,y,this.size)) {
                     this.selectionIndex = i;
+                    this.BoardUnits.renderUnits(this.size,this.state.board.units)
+                    tile.drawSelection(this.size,this.state.unitCanvas.ctx)
                     break;
-                }  
+                }
             }
-            this.boardCreation()
-            this.setState({
-                selectedTile:this.tiles[i]
-            })
+
+            var alreadyHasMove = this.checkUnitForMove(this.BoardUnits.getUnitAtSelectedTile(tile))
+            this.BoardUnits.renderDrawMoving(this.size,this.state.board.tiles)
+            
+            if(tile.getIsMoveable()){
+                if(!move) {
+                    move = new Move(this.state.selectedUnit,targetIndex)
+                }
+                if(tileMoves < move.getUnit().speed){
+                    move.addNewPosition(i)
+                    tile.drawMoving(this.size,this.state.unitCanvas.ctx)
+                    if(tileMoves+1 < move.getUnit().speed){
+                        this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)
+                    }
+                    this.setState({
+                        move:move
+                    })
+                    tileMoves++
+                } 
+            }else{
+                this.clearMovingItems()
+                move = null
+                tileMoves = 0
+                move = null
+                targetIndex = null
+                this.setState({
+                    selectedTile:this.state.board.tiles[i],
+                    move:null
+                })
+            }
+            
+            
+            if(!move){
+                this.setState({
+                    selectedUnit:this.BoardUnits.getUnitAtSelectedTile(tile)
+                })
+                targetIndex = i
+            }
+
+            if(!alreadyHasMove){
+                if(this.state.selectedUnit){
+                    if(this.state.selectedUnit.owner === this.uid){
+                        if(tileMoves < this.state.selectedUnit.speed){
+                            this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)                    
+                        }
+                    }
+                }
+            }else{
+
+            }
+            
         }
     }
 
-     updateWindowDimensions(input) {
+    checkUnitForMove(target){
+        if(target){
+            var output = false;
+            for(var i = 0;i<this.turnSubmission.moves.length;i++){
+                var move = this.turnSubmission.moves[i].move
+                if(move.unit.unitUID === target.unitUID){
+                    for(var j = 0;j<move.moves.length;j++){
+                        this.state.board.tiles[move.moves[j].index].drawMoving(this.size,this.state.unitCanvas.ctx)
+                    }
+                    output = true                    
+                }
+            }
+            return output
+        }
+    }
+
+    updateWindowDimensions(input) {
         var size = this.size*input
         this.setState({ width: size, height: size })
     }
 
-    //Inits the scroll and keydown events for viewing the map
-    mapMovementEvents(){
-        //setting boxes to a larger or smaller setting to zoom in
-        // eslint-disable-next-line
-        this.state.canvas.onwheel = (e) =>{
-            e.preventDefault(); // stop the page scrolling
-            if (e.deltaY < 0) {
-                if(this.size < 80)
-                    this.size = this.size * 1.1; // zoom in
-            } else if(this.size > 35) {
-                this.size = this.size * (1 / 1.1); // zoom out is inverse of zoom in
-            }
-            this.updateWindowDimensions(this.state.board.size)
-            this.boardCreation()
+    clearMovingItems(){
+        for(var i = 0;i<this.state.board.tiles.length;i++){
+            this.state.board.tiles[i].setIsMoveableToFalse()
+            this.state.board.tiles[i].setMovingToToFalse()
         }
-
-        // eslint-disable-next-line
-        this.state.canvas.onkeydown = (e) =>{
-            if(this.keysDown.indexOf(e.key)===-1) this.keysDown.push(e.key)
-        }
-        // eslint-disable-next-line
-        this.state.canvas.onkeyup = (e) =>{
-            this.keysDown.splice(this.keysDown.indexOf(e.key),1)
-        }
-        
-        // eslint-disable-next-line
-        this.state.canvas.tabIndex = 1000;
-        setInterval(() => {
-            var scrollX = window.scrollX
-            var scrollY = window.scrollY
-            var rate = 4
-            
-            if(this.keysDown.indexOf('a')>-1){
-                scrollX-=rate
-            }else if(this.keysDown.indexOf('d')>-1){
-                scrollX+=rate
-            }else if(this.keysDown.indexOf('w')>-1){
-                scrollY-=rate
-            }else if(this.keysDown.indexOf('s')>-1){
-                scrollY+=rate
-            }
-            window.scrollTo(scrollX,scrollY)
-        }, 100);
     }
+
+    submitHandler(value){
+        this.turnSubmission.addMove(value[0])
+        this.BoardUnits.renderUnits(this.size,this.state.board.units)
+        document.getElementById('tileDataBox').style.display = 'none';
+    }
+
+    removalHandler(value){
+        this.turnSubmission.removeMove(value[2].unitUID)
+        document.getElementById('tileDataBox').style.display = 'none';
+    }
+
+    submitTurn(){
+        this.turnSubmission.submitTurn(this.matchID,this.uid)
+        this.turnSubmission.clearMoves()
+    }
+
+    
+
+     
 
     render() {
         return (
             <React.Fragment>
                 <div>ID: {this.props.match.params.gameID}</div>
                 <button onClick={this.leaveMatch}>Leave Match</button>
-                <canvas id='canvasBoard' ref='canvas' width={this.state.width} height={this.state.height}></canvas>
-                <TileData tile={this.state.selectedTile} size={this.size} />
+                <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <button onClick={this.submitTurn} id='submitButton'>Submit</button>
+                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={[this.state.move,this.turnSubmission,this.state.selectedUnit]} size={this.size} onSubmit={this.submitHandler} onRemove={this.removalHandler} />
             </React.Fragment>
         )
     }

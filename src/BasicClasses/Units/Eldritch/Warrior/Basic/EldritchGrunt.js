@@ -1,25 +1,30 @@
 import BigCthuluSprite from './big_cthulu.png'
+import UnitAbstract from '../../../UnitAbstract'
 
-class EldritchGrunt{
+class EldritchGrunt extends UnitAbstract{
     constructor(uid,size,x,y,context,canvas){
-
+        super()
         //////This is the units game information
         this.owner = uid
         this.name = "Eldritch Grunt"
         this.race = "Eldritch"
-
-
-
-
-
-
+        this.health = 100
+        this.attack = {
+            min:5,
+            max:8
+        }
+        this.armor = {
+            min:6,
+            max:9
+        }
+        this.speed = 2
 
         //////This is all information for rendering the unit on the page//////
         this.state = {
             size: size
         }
         this.img = BigCthuluSprite
-        this.positions = {
+        this.position = {
             x:x,
             y:y
         }
@@ -50,21 +55,7 @@ class EldritchGrunt{
         this.owner = input
     }
 
-    drawImage(){
-        var img = new Image();
-            img.src = this.img;
-        
-        this.context.drawImage(img,
-            this.pixelsLeft,
-            this.pixelsTop,
-            this.spriteWidth,
-            this.spriteHeight,
-            this.positions.x*this.state.size,
-            this.positions.y*this.state.size,
-            this.state.size*.8,
-            this.state.size*.8
-        );
-    }
+    
 
     getImage(){
         return this.img

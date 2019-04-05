@@ -1,4 +1,5 @@
-import TileAbstract from './TileAbstract';
+import TileAbstract from '../TileAbstract';
+import grass from './FertileSoil.png'
 
 export default class FertileSoil extends TileAbstract{
 
@@ -9,6 +10,12 @@ export default class FertileSoil extends TileAbstract{
         this.color = "green";
         this.image = null;
         this.classType = 'FertileSoil';
+        this.img = grass;
+        this.imgSize = 240;
+    }
+
+    getClassType(){
+        return this.classType
     }
 
     getFertility(){
@@ -51,5 +58,8 @@ export default class FertileSoil extends TileAbstract{
         this.image = input;
     }
 
+    getImageSize(){
+        return this.imgSize;
+    }
 
 }

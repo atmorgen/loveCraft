@@ -133,6 +133,33 @@ class Firestore{
         })
     }
 
+    /////For Turn Submission//////
+
+    submitTurnToMatch(matchID,submission){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).update({
+                "turnSubmission":firebase.firestore.FieldValue.arrayUnion(submission)
+            }).then(function(){
+                resolve()
+            })
+        })
+    }
+
+    checkIfAlreadySubmitted(matchID,uid){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                var submissions = doc.data().turnSubmission
+                
+                for(var i = 0;i<submissions.length;i++){
+                    var submission = JSON.parse(submissions[i])
+                    
+                    if(uid === submission.uid) resolve(true)
+                }
+                resolve(false)
+            })
+        })
+    }
+
 }
 
 export default Firestore

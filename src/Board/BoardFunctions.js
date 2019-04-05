@@ -16,26 +16,35 @@ export default class BoardFunctions{
     }
 
     withinTile(tile,x,y,size){
-        if(x >= tile.x && y >= tile.y){
-            if(x <= (tile.x+size) && y <= (tile.y+size)){
+        var relativeX = tile.position.x*size
+        var relativeY = tile.position.y*size
+        if(x >= relativeX && y >= relativeY){
+            if(x <= (relativeX+size) && y <= (relativeY+size)){
                 return true;
             }
         }
     }
 
-    //Creates and draws the rectangles within the canvas
-    rect(props,size) {
-        const {ctx, x, y, color, stroke, border} = props;
-        //creation
-        ctx.rect(x,y,size,size);
-        //coloring
-        ctx.beginPath()
-        ctx.fillStyle=color;
-        ctx.fillRect(x,y,size,size);
-        //border
-        ctx.lineWidth=border;
-        ctx.strokeStyle=stroke;
-        ctx.strokeRect(x,y,size,size); 
+    getSurroundingTiles(board,index,size, ctx){
+        var surroundingIndex = [index-1, //left
+                                index+1, //right
+                                index-board.size,  //above
+                                index+board.size]  //below
+        
+        for(var i = 0;i<surroundingIndex.length;i++){
+            var tile = board.tiles[surroundingIndex[i]]
+            
+            //tile is on the map
+            if(tile){
+                if(!tile.getMovingTo()){
+                    //if tile isn't water 
+                    if(tile.getClassType() !== "Water") {
+                        tile.drawMoveable(size,ctx)
+                    }
+                }
+            }
+        }
+
     }
 
     //reclassifies the Board and all the tiles within it to the correct type of class object
@@ -46,7 +55,7 @@ export default class BoardFunctions{
         for(var i = 0;i<tiles.length;i++){
             var tile = tiles[i]
             for(var j = 0;j<this.tileTypes.length;j++){
-                if(tile.classType == new this.tileTypes[j]().classType){
+                if(tile.classType === new this.tileTypes[j]().classType){
                     board.addTile(new this.tileTypes[j](tile.position.x,tile.position.y))
                     break;
                 }

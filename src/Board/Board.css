@@ -1,7 +1,57 @@
-#canvasBoard{
+#canvasBoardTile{
     position: absolute;
     margin: 50px;
     border-style: solid;
     border-width: 2px;
-    border-color: maroon
+    border-color: maroon;
+    z-index: -1;
+}
+
+#canvasBoardUnit{
+    position: absolute;
+    margin: 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: maroon;
+    background-color: transparent;
+    pointer-events:none;
+}
+
+#canvasBoardSelection{
+    position: absolute;
+    margin: 50px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: maroon;
+    background-color: transparent;
+    pointer-events:none;
+}
+
+#offCanvas{
+    height:0;
+    width:0;
+}
+
+#submitButton{
+    top:2%;
+    left:93%;
+    position: fixed;
+    cursor: pointer;
+    
+    color: #fff !important;
+    text-transform: uppercase;
+    background: #ed3330;
+    padding: 20px;
+    border-radius: 5px;
+    display: inline-block;
+    border: none;
+}
+
+#submitButton:hover{
+    background: #434343;
+    letter-spacing: 1px;
+    -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+    -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+    box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
+    transition: all 0.4s ease 0s;
 }
