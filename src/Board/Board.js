@@ -264,26 +264,17 @@ class Canvas extends Component {
 
     submitHandler(value){
         this.turnSubmission.addMove(value[0])
+        this.BoardUnits.renderUnits(this.size,this.state.board.units)
+        document.getElementById('tileDataBox').style.display = 'none';
     }
 
     removalHandler(value){
         this.turnSubmission.removeMove(value[2].unitUID)
-        console.log(this.turnSubmission)
-    }
-
-
-
-
-
-
-
-    makeMove(){
-        var tileToMoveTo = this.state.selectedTile
-        this.BoardUnits.moveUnit(this.matchID,this.state.selectedUnit,tileToMoveTo.getPosition().x,tileToMoveTo.getPosition().y)
+        document.getElementById('tileDataBox').style.display = 'none';
     }
 
     submitTurn(){
-        this.BoardUnits.submitTurn()
+        this.turnSubmission.submitTurn(this.matchID,this.uid)
     }
 
     

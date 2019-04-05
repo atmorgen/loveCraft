@@ -4,7 +4,7 @@
     height: auto;
     background: white;
     opacity: .85;
-    visibility: hidden;
+    display: none;
     padding: 10px 10px;
 }
 

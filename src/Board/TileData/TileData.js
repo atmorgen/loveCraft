@@ -53,13 +53,13 @@ class TileData extends Component {
 
     visibility(){
         var tileBox = document.getElementById('tileDataBox')
-        if(tileBox.style.visibility === '' || tileBox.style.visibility === 'hidden') tileBox.style.visibility = 'visible'
+        if(tileBox.style.display === 'none' || tileBox.style.display === "") tileBox.style.display = 'block'
     }
 
     closeBox(){
         var tileBox = document.getElementById('tileDataBox')
-        tileBox.style.visibility = 'hidden'
-        document.getElementById('unitTab').style.visibility = 'hidden'
+        tileBox.style.display = 'none'
+        document.getElementById('unitTab').style.display = 'none'
     }
 
     renderTileData(){
@@ -83,7 +83,7 @@ class TileData extends Component {
         }
 
         if(unit){
-            unitTab.style.visibility = 'visible'
+            unitTab.style.display = 'block'
             var unitDataNew = {
                 unitName:unit.name,
                 unitRace:unit.race,
@@ -104,7 +104,7 @@ class TileData extends Component {
                 })
             }
         }else{
-            unitTab.style.visibility = 'hidden';
+            unitTab.style.display = 'none';
         }
     }
 

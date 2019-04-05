@@ -20,8 +20,6 @@ class BoardUnits{
         this.uid = uid
         this.units = []
         this.tileData = new TileData()
-        //for move submissions
-        this.turnSubmission = new TurnSubmission()
         //this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
 
         this.eldritchTypes = [
@@ -115,11 +113,6 @@ class BoardUnits{
             console.log('already submitted 2 moves!')
         }
         this.tileData.closeBox()
-    }
-
-    //submits turn to the server
-    submitTurn(){
-        this.turnSubmission.submitTurn(this.matchdID,this.uid)
     }
 
     renderDrawMoving(size,tiles){
