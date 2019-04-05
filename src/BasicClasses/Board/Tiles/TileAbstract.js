@@ -1,5 +1,6 @@
 import selection from './selection.png'
 import moveable from './moveable.png'
+import moving from './moving.png'
 
 export default class TileAbstract{
     constructor(x,y){
@@ -7,6 +8,8 @@ export default class TileAbstract{
             x,
             y
         }
+        this.isMoveable = false
+        this.movingTo = false
     }
 
     getPosition(){
@@ -18,12 +21,34 @@ export default class TileAbstract{
         this.position.y = y;
     }
 
+    getIsMoveable(){
+        return this.isMoveable;
+    }
+
+    setIsMoveableToTrue(){
+        this.isMoveable = true;
+    }
+
+    setIsMoveableToFalse(){
+        this.isMoveable = false;
+    }
+
+    getMovingTo(){
+        return this.movingTo;
+    }
+
+    setMovingToToTrue(){
+        this.movingTo = true;
+    }
+
+    setMovingToToFalse(){
+        this.movingTo = false;
+    }
+
     drawImg(doHighlight,size,ctx){
         var img = new Image();
             img.src = this.img;
-        
-            //var highlight = doHighlight ? "brightness(150%)":"brightness(100%)";
-            //ctx.filter = highlight
+
             img.onload = () =>{
                 ctx.drawImage(img,
                     0,
@@ -58,9 +83,30 @@ export default class TileAbstract{
     }
 
     drawMoveable(size,ctx){
-        var img = new Image();
+        if(!this.getMovingTo()){
+            var img = new Image();
             img.src = moveable
 
+            img.onload = () => {
+                ctx.drawImage(img,
+                    0,
+                    0,
+                    32,
+                    32,
+                    this.position.x*size,
+                    this.position.y*size,
+                    size,
+                    size
+                );
+            }
+            this.setIsMoveableToTrue()
+        } 
+    }
+
+    drawMoving(size,ctx){
+        var img = new Image();
+            img.src = moving
+        
         img.onload = () => {
             ctx.drawImage(img,
                 0,
@@ -73,5 +119,6 @@ export default class TileAbstract{
                 size
             );
         }
+        this.setMovingToToTrue()
     }
 }

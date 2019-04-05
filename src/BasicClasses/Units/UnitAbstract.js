@@ -2,6 +2,7 @@ export default class Unit{
 
     constructor(){
         this.unitUID = this.getRandomID()
+        this.move=null
     }
 
     getRandomID(){
@@ -10,6 +11,18 @@ export default class Unit{
 
     getUnitUID(){
         return this.unitUID;
+    }
+
+    getMove(){
+        return this.move;
+    }
+
+    setMove(input){
+        this.move = input;
+    }
+
+    clearMove(){
+        this.move=null;
     }
 
     drawImage(){

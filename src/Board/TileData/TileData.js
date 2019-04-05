@@ -3,6 +3,10 @@ import './TileData.css'
 import _ from 'lodash';
 
 class TileData extends Component {
+    constructor(){
+        super()
+        this.submitMove = this.submitMove.bind(this)
+    }
     state = { 
         tileData:{
             tileName:null,
@@ -114,8 +118,12 @@ class TileData extends Component {
         for (i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
-
+        document.getElementById('turnSubmitButton').style.display = 'none'
+        
         if(this.props.unit){
+            if(this.props.unit.username === localStorage.getItem('username')){
+                document.getElementById('turnSubmitButton').style.display = 'block'
+            }
             document.getElementById('unitTab').className += " active";
             document.getElementById('Unit').style.display = "block";
         }else{
@@ -143,6 +151,12 @@ class TileData extends Component {
         evt.currentTarget.className += " active";
     }
 
+    submitMove(){
+        if (typeof this.props.onSubmit === 'function') {
+            this.props.onSubmit(this.props.move);
+        }
+    }
+
     render() { 
         return (
             <div id='tileDataBox'>
@@ -166,6 +180,7 @@ class TileData extends Component {
                     <p>Attack: {this.state.unitData.unitAttackMin} - {this.state.unitData.unitAttackMax}</p>
                     <p>Armor: {this.state.unitData.unitArmorMin} - {this.state.unitData.unitArmorMax}</p>
                     <p>Speed: {this.state.unitData.unitSpeed}</p>
+                    <button id='turnSubmitButton' onClick={this.submitMove}>Submit</button>
                 </div>
             </div>
         );

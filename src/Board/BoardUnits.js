@@ -22,7 +22,7 @@ class BoardUnits{
         this.tileData = new TileData()
         //for move submissions
         this.turnSubmission = new TurnSubmission()
-        this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
+        //this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
 
         this.eldritchTypes = [
             EldritchGrunt
@@ -109,10 +109,10 @@ class BoardUnits{
 
         //await this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
 
-        if(this.turnSubmission.getMoves().length<3){
+        if(this.turnSubmission.getMoves().length<2){
             this.turnSubmission.addMove(new Move(correctUnit[0],x,y))
         }else{
-            console.log('already submitted 3 moves!')
+            console.log('already submitted 2 moves!')
         }
         this.tileData.closeBox()
     }

@@ -1,15 +1,30 @@
 export default class Move{
-    constructor(unit,x,y){
+    constructor(unit,startingIndex){
         this.move = {
             unit:unit,
-            newPosition:{
-                x:x,
-                y:y
-            }
+            startingIndex:startingIndex,
+            moves:[]
         }
+    }
+    getUnit(){
+        return this.move.unit;
+    }
+
+    getStartingIndex(){
+        return this.startingIndex;
     }
 
     getMove(){
         return this.move;
+    }
+
+    getMoves(){
+        return this.move.moves;
+    }
+
+    addNewPosition(index){
+        this.move.moves.push({
+            index
+        })
     }
 }

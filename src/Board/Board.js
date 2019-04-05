@@ -12,16 +12,21 @@ import * as ROUTES from '../Routes/routes';
 import BoardFunctions from './BoardFunctions'
 //Tile UI Component
 import TileData from './TileData/TileData';
-//Unit Testing
+//Unit Functions
 import BoardUnits from './BoardUnits';
+//Move Classes
+import Move from '../BasicClasses/Match/Move';
+import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
 
 class Canvas extends Component {
     constructor(props) {
         super(props);
+        //width and height of the board
         this.state = { 
             width: 0, 
             height: 0
         }
+        //tile size
         this.size = 80;
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -34,8 +39,6 @@ class Canvas extends Component {
         this.db = firebase.firestore()
         this.matchID=null
         this.uid=null
-        //Board Information
-        this.rects = []
         //Units Information
         this.BoardUnits = null
         //For Tile Selection
@@ -44,6 +47,8 @@ class Canvas extends Component {
         this.keysDown = []
         //Functions
         this.boardFunctions = null
+        //for submitting a turn
+        this.turnSubmission = new TurnSubmission()
     }
 
     componentDidMount(){
@@ -79,7 +84,7 @@ class Canvas extends Component {
                     unitCanvas:{
                         ctx:this.refs.unitCanvas.getContext('2d'),
                         canvas:this.refs.unitCanvas
-                    }                    
+                    }                   
                 })
             this.boardFunctions = new BoardFunctions(this.state.tileCanvas.ctx,this.state.tileCanvas.canvas)
             //creates the units on the board
@@ -142,48 +147,90 @@ class Canvas extends Component {
             })
     }
 
+    //Responsible for redrawing the rectangles each time there is an update
+    boardCreation(){
+        this.state.tileCanvas.ctx.clearRect(0, 0, this.state.tileCanvas.canvas.width, this.state.tileCanvas.canvas.height);
+        for(var i = 0;i<this.state.board.tiles.length;i++){
+            var tile = this.state.board.tiles[i]
+            tile.drawImg(false,this.size,this.state.tileCanvas.ctx)
+        }
+    }
+
     tileSelect(){
+        var tileMoves = 0,
+            targetIndex,
+            tile,
+            move;
         // eslint-disable-next-line
         this.state.tileCanvas.canvas.onmousedown = (e)=>{
             var clientRect = this.state.tileCanvas.canvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
-            y = e.clientY - clientRect.top
-            for(var i = 0;i<this.state.board.tiles.length;i++){
-                var rect = this.state.board.tiles[i];
+            y = e.clientY - clientRect.top,
+            i;
+            for(i = 0;i<this.state.board.tiles.length;i++){
+                tile = this.state.board.tiles[i];
                 
-                if(this.boardFunctions.withinTile(rect,x,y,this.size)) {
+                if(this.boardFunctions.withinTile(tile,x,y,this.size)) {
                     this.selectionIndex = i;
                     this.BoardUnits.renderUnits(this.size,this.state.board.units)
-                    rect.drawSelection(this.size,this.state.unitCanvas.ctx)
+                    tile.drawSelection(this.size,this.state.unitCanvas.ctx)
                     break;
-                }  
-            }
-            
-            this.setState({
-                selectedTile:this.state.board.tiles[i]
-            })
-
-            if(this.state.selectedTile){
-                if(this.state.selectedTile.isMoveable){
-                    if(this.state.selectedTile.getClassType() !== "Water"){
-                        this.makeMove()
-                    }
-                }else{
-                    this.clearMoveable()
                 }
             }
+
+            for(var j = 0;j<this.state.board.tiles.length;j++){
+                var drawingTile = this.state.board.tiles[j];
+                if(drawingTile.getMovingTo()){
+                    drawingTile.drawMoving(this.size,this.state.unitCanvas.ctx)
+                } 
+            }
             
-            this.setState({
-                selectedUnit:this.BoardUnits.getUnitAtSelectedTile(this.state.board.tiles[i])
-            })
+            if(tile.getIsMoveable()){
+                if(!move) {
+                    move = new Move(this.state.selectedUnit,targetIndex)
+                }
+                if(tileMoves < move.getUnit().speed){
+                    move.addNewPosition(i)
+                    tile.drawMoving(this.size,this.state.unitCanvas.ctx)
+                    if(tileMoves+1 < move.getUnit().speed){
+                        this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)
+                    }
+                    this.setState({
+                        move:move
+                    })
+                    tileMoves++
+                } 
+            }else{
+                this.clearMovingItems()
+                move = null
+                tileMoves = 0
+                move = null
+                targetIndex = null
+                this.setState({
+                    selectedTile:this.state.board.tiles[i]
+                })
+            }
+            
+            
+            if(!move){
+                this.setState({
+                    selectedUnit:this.BoardUnits.getUnitAtSelectedTile(tile)
+                })
+                targetIndex = i
+            }
 
             if(this.state.selectedUnit){
-                if(this.state.selectedUnit.username === localStorage.getItem('username')){
-                    this.isMoveable()
-                    this.movingUnit = this.state.selectedUnit
+                if(this.state.selectedUnit.owner === this.uid){
+                    if(tileMoves < this.state.selectedUnit.speed){
+                        this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)                    
+                    }
                 }
             }
         }
+    }
+
+    submitHandler(value){
+        console.log(value)
     }
 
     makeMove(){
@@ -195,114 +242,16 @@ class Canvas extends Component {
         this.BoardUnits.submitTurn()
     }
 
-    //Responsible for redrawing the rectangles each time there is an update
-    boardCreation(){
-        this.rects = []
-        this.state.tileCanvas.ctx.clearRect(0, 0, this.state.tileCanvas.canvas.width, this.state.tileCanvas.canvas.height);
+    clearMovingItems(){
         for(var i = 0;i<this.state.board.tiles.length;i++){
-            var tile = this.state.board.tiles[i]
-            tile.drawImg(false,this.size,this.state.tileCanvas.ctx)
-        }
-        this.mapMovementEvents()
-    }
-
-    //returns whether or not a tile is within moveable range of the selected unit
-    isMoveable(){
-        for(var i = 0;i<this.state.board.tiles.length;i++){
-            var tile = this.state.board.tiles[i]
-            tile.isMoveable=false
-            if(i!=this.selectionIndex){
-                //left and right
-                if(i>=this.selectionIndex-this.state.selectedUnit.speed && i<=this.selectionIndex+this.state.selectedUnit.speed){
-                    this.state.board.tiles[i].isMoveable = true
-                    this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
-                }
-                //have to loop through the top and bottom tiles because they are not iterative indexes
-                for(var j = 1;j<=this.state.selectedUnit.speed;j++){
-                    //above
-                    if(i===this.selectionIndex-(this.state.board.size*j)){
-                        this.state.board.tiles[i].isMoveable = true
-                        this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
-                    }
-                    //below
-                    if(i===this.selectionIndex+(this.state.board.size*j)){
-                        this.state.board.tiles[i].isMoveable = true
-                        this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
-                    }
-                    //prevents it from boxing
-                    if(j!=this.state.selectedUnit.speed){
-                        //top left                                                //top right
-                        if(i===this.selectionIndex-(this.state.board.size*j)-1 || i===this.selectionIndex-(this.state.board.size*j)+1){
-                            this.state.board.tiles[i].isMoveable = true
-                            this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
-                        }
-                        //bottom left                                             //bottom right
-                        if(i===this.selectionIndex+(this.state.board.size*j)-1 || i===this.selectionIndex+(this.state.board.size*j)+1){
-                            this.state.board.tiles[i].isMoveable = true
-                            this.state.board.tiles[i].drawMoveable(this.size,this.state.unitCanvas.ctx)
-                        }
-                    }
-                }
-            }
-        }     
-    }
-
-    clearMoveable(){
-        for(var i = 0;i<this.state.board.tiles.length;i++){
-            this.state.board.tiles[i].isMoveable=false
+            this.state.board.tiles[i].setIsMoveableToFalse()
+            this.state.board.tiles[i].setMovingToToFalse()
         }
     }
 
      updateWindowDimensions(input) {
         var size = this.size*input
         this.setState({ width: size, height: size })
-    }
-
-    //Inits the scroll and keydown events for viewing the map
-    mapMovementEvents(){
-        //setting boxes to a larger or smaller setting to zoom in
-        //Turning this off for now while we build some other stuff.  Will Come back to this later
-        /* 
-        // eslint-disable-next-line
-        this.state.canvas.onwheel = (e) =>{
-            e.preventDefault(); // stop the page scrolling
-            if (e.deltaY < 0) {
-                if(this.size < 80)
-                    this.size = this.size * 1.1; // zoom in
-            } else if(this.size > 35) {
-                this.size = this.size * (1 / 1.1); // zoom out is inverse of zoom in
-            }
-            this.updateWindowDimensions(this.state.board.size)
-            this.boardCreation()
-        }
-        */
-        // eslint-disable-next-line
-        this.state.tileCanvas.canvas.onkeydown = (e) =>{
-            if(this.keysDown.indexOf(e.key)===-1) this.keysDown.push(e.key)
-        }
-        // eslint-disable-next-line
-        this.state.tileCanvas.canvas.onkeyup = (e) =>{
-            this.keysDown.splice(this.keysDown.indexOf(e.key),1)
-        }
-        
-        // eslint-disable-next-line
-        this.state.tileCanvas.canvas.tabIndex = 1000;
-        setInterval(() => {
-            var scrollX = window.scrollX
-            var scrollY = window.scrollY
-            var rate = 4
-            
-            if(this.keysDown.indexOf('a')>-1){
-                scrollX-=rate
-            }else if(this.keysDown.indexOf('d')>-1){
-                scrollX+=rate
-            }else if(this.keysDown.indexOf('w')>-1){
-                scrollY-=rate
-            }else if(this.keysDown.indexOf('s')>-1){
-                scrollY+=rate
-            }
-            window.scrollTo(scrollX,scrollY)
-        }, 100);
     }
 
     render() {
@@ -313,7 +262,7 @@ class Canvas extends Component {
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <button onClick={this.submitTurn} id='submitButton'>Submit</button>
-                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} size={this.size} />
+                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={this.state.move} size={this.size} onSubmit={this.submitHandler} />
             </React.Fragment>
         )
     }

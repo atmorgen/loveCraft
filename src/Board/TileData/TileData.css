@@ -5,17 +5,17 @@
     background: white;
     opacity: .85;
     visibility: hidden;
-    
+    padding: 10px 10px;
 }
 
 #topHeader{
     overflow: hidden;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
+    width:54.5%;
 }
 
 #tileDataBox button {
-    background-color: inherit;
     float: left;
     border: none;
     outline: none;
@@ -60,4 +60,26 @@
 
 #Tile{
     line-height: .5;
+}
+
+#turnSubmitButton{
+    position: relative;
+    cursor: pointer;
+    
+    color: #fff !important;
+    text-transform: uppercase;
+    background: #ed3330;
+    padding: 20px;
+    border-radius: 5px;
+    display: inline-block;
+    border: none;
+}
+
+#turnSubmitButton:hover{
+    background: #434343;
+    letter-spacing: 1px;
+    -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+    -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+    box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
+    transition: all 0.4s ease 0s;
 }
