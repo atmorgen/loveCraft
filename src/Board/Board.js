@@ -275,6 +275,7 @@ class Canvas extends Component {
 
     submitTurn(){
         this.turnSubmission.submitTurn(this.matchID,this.uid)
+        this.turnSubmission.clearMoves()
     }
 
     
