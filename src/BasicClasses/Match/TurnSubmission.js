@@ -16,7 +16,18 @@ export default class TurnSubmission{
     }
 
     addMove(input){
-        this.moves.push(input)
+        if(this.getMoves().length<2){
+            this.moves.push(input)
+        }
+    }
+
+    removeMove(unitUID){
+        for(var i = 0;i<this.getMoves().length;i++){
+            var move = this.getMoves()[i].move
+            if(move.unit.unitUID === unitUID){ 
+                this.moves.splice(i,1)
+            }
+        }
     }
 
     async submitTurn(matchID,uid){

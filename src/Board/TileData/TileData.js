@@ -6,6 +6,7 @@ class TileData extends Component {
     constructor(){
         super()
         this.submitMove = this.submitMove.bind(this)
+        this.removeMove = this.removeMove.bind(this)
     }
     state = { 
         tileData:{
@@ -118,12 +119,15 @@ class TileData extends Component {
         for (i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
-        document.getElementById('turnSubmitButton').style.display = 'none'
-        
+
+        var turnButtons = document.getElementsByClassName("turnButtons");
+        for(i = 0;i<turnButtons.length;i++){
+            turnButtons[i].style.display = 'none';
+        }
+
+        //hide/show the correct submit or remove button
+        this.checkUnitForMove() ? document.getElementById('turnRemoveButton').style.display = 'block' : document.getElementById('turnSubmitButton').style.display = 'block'
         if(this.props.unit){
-            if(this.props.unit.username === localStorage.getItem('username')){
-                document.getElementById('turnSubmitButton').style.display = 'block'
-            }
             document.getElementById('unitTab').className += " active";
             document.getElementById('Unit').style.display = "block";
         }else{
@@ -136,11 +140,11 @@ class TileData extends Component {
         // Declare all variables
         var i, tabcontent, tablinks;
 
-         // Get all elements with class="tabcontent" and hide them
-         tabcontent = document.getElementsByClassName("tabcontent");
-         for (i = 0; i < tabcontent.length; i++) {
-             tabcontent[i].style.display = "none";
-         }
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
 
         // Get all elements with class="tablinks" and remove the class "active"
         tablinks = document.getElementsByClassName("tablinks");
@@ -154,6 +158,25 @@ class TileData extends Component {
     submitMove(){
         if (typeof this.props.onSubmit === 'function') {
             this.props.onSubmit(this.props.move);
+        }
+    }
+
+    removeMove(){
+        if (typeof this.props.onSubmit === 'function') {
+            this.props.onRemove(this.props.move);
+        }
+    }
+
+    checkUnitForMove(){
+        if(this.props.move[2]){
+            var output = false;
+            for(var i = 0;i<this.props.move[1].moves.length;i++){
+                var move = this.props.move[1].moves[i].move
+                if(move.unit.unitUID === this.props.move[2].unitUID){
+                    return true                    
+                }
+            }
+            return false
         }
     }
 
@@ -180,7 +203,8 @@ class TileData extends Component {
                     <p>Attack: {this.state.unitData.unitAttackMin} - {this.state.unitData.unitAttackMax}</p>
                     <p>Armor: {this.state.unitData.unitArmorMin} - {this.state.unitData.unitArmorMax}</p>
                     <p>Speed: {this.state.unitData.unitSpeed}</p>
-                    <button id='turnSubmitButton' onClick={this.submitMove}>Submit</button>
+                    <button className="turnButtons" id='turnSubmitButton' onClick={this.submitMove}>Submit</button>
+                    <button className="turnButtons" id='turnRemoveButton' onClick={this.removeMove}>Remove</button>
                 </div>
             </div>
         );

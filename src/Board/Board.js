@@ -32,7 +32,9 @@ class Canvas extends Component {
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.tileSelect = this.tileSelect.bind(this);
         this.leaveMatch = this.leaveMatch.bind(this);
-        this.submitTurn = this.submitTurn.bind(this)
+        this.submitTurn = this.submitTurn.bind(this);
+        this.submitHandler = this.submitHandler.bind(this);
+        this.removalHandler = this.removalHandler.bind(this);
         //Firestore
         this.firestore = new Firestore()
         this.id = this.props.match.params.gameID;
@@ -163,6 +165,7 @@ class Canvas extends Component {
             move;
         // eslint-disable-next-line
         this.state.tileCanvas.canvas.onmousedown = (e)=>{
+
             var clientRect = this.state.tileCanvas.canvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top,
@@ -178,12 +181,8 @@ class Canvas extends Component {
                 }
             }
 
-            for(var j = 0;j<this.state.board.tiles.length;j++){
-                var drawingTile = this.state.board.tiles[j];
-                if(drawingTile.getMovingTo()){
-                    drawingTile.drawMoving(this.size,this.state.unitCanvas.ctx)
-                } 
-            }
+            var alreadyHasMove = this.checkUnitForMove(this.BoardUnits.getUnitAtSelectedTile(tile))
+            this.BoardUnits.renderDrawMoving(this.size,this.state.board.tiles)
             
             if(tile.getIsMoveable()){
                 if(!move) {
@@ -207,7 +206,8 @@ class Canvas extends Component {
                 move = null
                 targetIndex = null
                 this.setState({
-                    selectedTile:this.state.board.tiles[i]
+                    selectedTile:this.state.board.tiles[i],
+                    move:null
                 })
             }
             
@@ -219,19 +219,63 @@ class Canvas extends Component {
                 targetIndex = i
             }
 
-            if(this.state.selectedUnit){
-                if(this.state.selectedUnit.owner === this.uid){
-                    if(tileMoves < this.state.selectedUnit.speed){
-                        this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)                    
+            if(!alreadyHasMove){
+                if(this.state.selectedUnit){
+                    if(this.state.selectedUnit.owner === this.uid){
+                        if(tileMoves < this.state.selectedUnit.speed){
+                            this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)                    
+                        }
                     }
                 }
+            }else{
+
             }
+            
+        }
+    }
+
+    checkUnitForMove(target){
+        if(target){
+            var output = false;
+            for(var i = 0;i<this.turnSubmission.moves.length;i++){
+                var move = this.turnSubmission.moves[i].move
+                if(move.unit.unitUID === target.unitUID){
+                    for(var j = 0;j<move.moves.length;j++){
+                        this.state.board.tiles[move.moves[j].index].drawMoving(this.size,this.state.unitCanvas.ctx)
+                    }
+                    output = true                    
+                }
+            }
+            return output
+        }
+    }
+
+    updateWindowDimensions(input) {
+        var size = this.size*input
+        this.setState({ width: size, height: size })
+    }
+
+    clearMovingItems(){
+        for(var i = 0;i<this.state.board.tiles.length;i++){
+            this.state.board.tiles[i].setIsMoveableToFalse()
+            this.state.board.tiles[i].setMovingToToFalse()
         }
     }
 
     submitHandler(value){
-        console.log(value)
+        this.turnSubmission.addMove(value[0])
     }
+
+    removalHandler(value){
+        this.turnSubmission.removeMove(value[2].unitUID)
+        console.log(this.turnSubmission)
+    }
+
+
+
+
+
+
 
     makeMove(){
         var tileToMoveTo = this.state.selectedTile
@@ -242,17 +286,9 @@ class Canvas extends Component {
         this.BoardUnits.submitTurn()
     }
 
-    clearMovingItems(){
-        for(var i = 0;i<this.state.board.tiles.length;i++){
-            this.state.board.tiles[i].setIsMoveableToFalse()
-            this.state.board.tiles[i].setMovingToToFalse()
-        }
-    }
+    
 
-     updateWindowDimensions(input) {
-        var size = this.size*input
-        this.setState({ width: size, height: size })
-    }
+     
 
     render() {
         return (
@@ -262,7 +298,7 @@ class Canvas extends Component {
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <button onClick={this.submitTurn} id='submitButton'>Submit</button>
-                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={this.state.move} size={this.size} onSubmit={this.submitHandler} />
+                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={[this.state.move,this.turnSubmission,this.state.selectedUnit]} size={this.size} onSubmit={this.submitHandler} onRemove={this.removalHandler} />
             </React.Fragment>
         )
     }

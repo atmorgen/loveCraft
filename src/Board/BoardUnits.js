@@ -122,29 +122,13 @@ class BoardUnits{
         this.turnSubmission.submitTurn(this.matchdID,this.uid)
     }
 
-    moveImage(unit,x,y,stepsTop){
-        //init new image and add source
-        var img = new Image();
-            img.src = unit.img;
-
-        var steps = 0
-        var moveInterval = setInterval(() => {
-            this.boardCreation()
-            this.renderUnits(unit)
-            unit.context.drawImage(img,
-                unit.pixelsLeft,
-                //this pushes image down to the next bitmap image
-                unit.pixelsTop,
-                unit.spriteWidth,
-                unit.spriteHeight,
-                unit.positions.x+=x,
-                unit.positions.y+=y,
-                unit.width,
-                unit.height
-            );
-            steps++;
-            if(steps>=stepsTop) clearInterval(moveInterval)
-        }, 1000);
+    renderDrawMoving(size,tiles){
+        for(var j = 0;j<tiles.length;j++){
+            var drawingTile = tiles[j];
+            if(drawingTile.getMovingTo()){
+                drawingTile.drawMoving(size,this.state.ctx)
+            } 
+        }
     }
 
     //finds the unit at the selected tile and returns it to board.js
