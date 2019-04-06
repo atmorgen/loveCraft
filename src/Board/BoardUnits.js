@@ -4,10 +4,6 @@ import _ from 'lodash';
 
 import TileData from './TileData/TileData';
 
-//For move submission
-import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
-import Move from '../BasicClasses/Match/Move';
-
 class BoardUnits{
     
     constructor(context,canvas,matchID,uid){
@@ -95,24 +91,6 @@ class BoardUnits{
         }
         this.units = units;
         return board
-    }
-
-    async moveUnit(matchID,unit,x,y){
-        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
-        var correctUnit = matchUnits.filter(x =>
-            x.unitUID === unit.unitUID
-        )
-        correctUnit[0].position.x = x
-        correctUnit[0].position.y = y
-
-        //await this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
-
-        if(this.turnSubmission.getMoves().length<2){
-            this.turnSubmission.addMove(new Move(correctUnit[0],x,y))
-        }else{
-            console.log('already submitted 2 moves!')
-        }
-        this.tileData.closeBox()
     }
 
     renderDrawMoving(size,tiles){

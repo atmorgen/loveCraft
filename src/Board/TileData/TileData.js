@@ -120,14 +120,19 @@ class TileData extends Component {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
 
+        //Get the submit and remove buttons and set both displays to none
         var turnButtons = document.getElementsByClassName("turnButtons");
         for(i = 0;i<turnButtons.length;i++){
             turnButtons[i].style.display = 'none';
         }
 
-        //hide/show the correct submit or remove button
-        this.checkUnitForMove() ? document.getElementById('turnRemoveButton').style.display = 'block' : document.getElementById('turnSubmitButton').style.display = 'block'
+        
+
         if(this.props.unit){
+            if(this.props.unit.username === localStorage.getItem('username')){
+                //hide/show the correct submit or remove button
+                this.checkUnitForMove() ? document.getElementById('turnRemoveButton').style.display = 'block' : document.getElementById('turnSubmitButton').style.display = 'block'
+            }
             document.getElementById('unitTab').className += " active";
             document.getElementById('Unit').style.display = "block";
         }else{
@@ -169,7 +174,6 @@ class TileData extends Component {
 
     checkUnitForMove(){
         if(this.props.move[2]){
-            var output = false;
             for(var i = 0;i<this.props.move[1].moves.length;i++){
                 var move = this.props.move[1].moves[i].move
                 if(move.unit.unitUID === this.props.move[2].unitUID){

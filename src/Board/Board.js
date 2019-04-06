@@ -55,6 +55,7 @@ class Canvas extends Component {
 
     componentDidMount(){
         this.gameInit()
+        
     }
 
     getUID(){
@@ -70,7 +71,7 @@ class Canvas extends Component {
         //getting the matchID from the users profile db
         this.uid = await this.getUID()
         this.matchID = (await this.firestore.getMatchIDFromProfile(this.uid)).match
-
+        await this.firestore.requestToBeHost(this.matchID,this.uid)
         //if the gameID url matches the expected matchID from the users profile then continue
         if(this.matchID===this.id){
             //retrive the matchInfo
@@ -277,10 +278,6 @@ class Canvas extends Component {
         this.turnSubmission.submitTurn(this.matchID,this.uid)
         this.turnSubmission.clearMoves()
     }
-
-    
-
-     
 
     render() {
         return (

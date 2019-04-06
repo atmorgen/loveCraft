@@ -71,7 +71,8 @@ class Firestore{
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHMAKING).add({
                 player:username,
-                id:uid
+                id:uid,
+                ping:null
             }).then(function(doc){
                 console.log("Added to Queue with an ID of: ",doc.id)
                 resolve(doc.id)
@@ -130,6 +131,33 @@ class Firestore{
             }).then(function(){
                 resolve()
             })
+        })
+    }
+
+    getMatchHost(matchID){
+        return new Promise(resolve =>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                resolve(doc.data().host)
+            }).catch(function(error){
+                console.log(error)
+                resolve()
+            })
+        })
+    }
+
+    requestToBeHost(matchID,uid){
+        return new Promise(async (resolve)=>{
+            if(!(await this.getMatchHost(matchID))){
+                this.db.collection(DB.MATCHES).doc(matchID).update({
+                    host:uid
+                }).then(function(){
+                    console.log("host claimed!")
+                    resolve()
+                })
+            }else{
+                console.log('host already claimed!')
+                resolve()
+            }
         })
     }
 
