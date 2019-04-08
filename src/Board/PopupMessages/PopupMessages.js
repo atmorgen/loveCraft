@@ -3,16 +3,6 @@ import './PopupMessages.css'
 
 class PopupMessages extends Component {
 
-    constructor(){
-        super()
-        
-    }
-
-    componentDidUpdate(){
-        //document.getElementById('popUpMessage').innerHTML = "This is a message"
-    }
-
-    state = {  }
     render() { 
         return (  
             <React.Fragment>

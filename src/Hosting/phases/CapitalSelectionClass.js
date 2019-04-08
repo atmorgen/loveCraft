@@ -1,6 +1,5 @@
 import firebase from 'firebase'
 import * as DB from '../../Firebase/Firestore/DB';
-import Submission from '../submission';
 
 export default class CapitalSelectionClass{
     constructor(){
@@ -27,7 +26,7 @@ export default class CapitalSelectionClass{
     checkForSubmissionUpdate(matchData,id){
         var turnSubmission = matchData.turnSubmission
         
-        
+        console.log(turnSubmission)
         /*
         //if both players have submitted a turn
         if(turnSubmission.p1 && turnSubmission.p2){

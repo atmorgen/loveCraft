@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-
-import TileData from '../TileData/TileData';
-import Move from '../../BasicClasses/Match/Move';
+import './PlayerCapitalSelectClass.css'
 
 //Popup Component
-import PopupMessages from '../PopupMessages/PopupMessages';
+import PopupMessages from '../../PopupMessages/PopupMessages';
 
 export default class PlayerCapitalSelectClass extends Component{
     constructor(props){
@@ -67,11 +65,29 @@ export default class PlayerCapitalSelectClass extends Component{
             return output
         }
     }
+
+    submitHandler(value){
+        this.turnSubmission.addMove(value[0])
+        this.BoardUnits.renderUnits(this.size,this.state.board.units)
+        document.getElementById('tileDataBox').style.display = 'none';
+    }
+
+    removalHandler(value){
+        this.turnSubmission.removeMove(value[2].unitUID)
+        document.getElementById('tileDataBox').style.display = 'none';
+    }
+
+    submitTurn(){
+        console.log('submit')
+        //this.turnSubmission.submitTurn(this.matchID,this.uid)
+        //this.turnSubmission.clearMoves()
+    }
     
     render() {
         return (
             <React.Fragment>
                 <PopupMessages />
+                <button onClick={this.submitTurn} id='submitButton'>Submit</button>
             </React.Fragment>
         )
     }

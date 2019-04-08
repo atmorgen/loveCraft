@@ -41,7 +41,7 @@ export default class Hosting{
         if(!this.phase){
             this.phase = new CapitalSelectionClass()
         }else{
-            this.phase = new this.phases[this.phase]
+            this.phase = new this.phases[this.phase]()
         }
         //this.moveToNextPhase()
     }

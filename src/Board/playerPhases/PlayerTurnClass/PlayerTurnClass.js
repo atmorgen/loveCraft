@@ -1,5 +1,5 @@
 //Move Classes
-import Move from '../../BasicClasses/Match/Move';
+import Move from '../../../BasicClasses/Match/Move';
 
 export default class PlayerTurnClass{
 

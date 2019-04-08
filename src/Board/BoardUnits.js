@@ -33,10 +33,10 @@ class BoardUnits{
     
     renderUnits(size,units){
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        var units = JSON.parse(units)
-        for(var i = 0;i<units.length;i++){
-            units[i].state.size = size
-            units[i].drawImage()
+        var unitsParsed = JSON.parse(units)
+        for(var i = 0;i<unitsParsed.length;i++){
+            unitsParsed[i].state.size = size
+            unitsParsed[i].drawImage()
         } 
     }
 
