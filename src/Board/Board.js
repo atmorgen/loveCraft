@@ -19,6 +19,15 @@ import Move from '../BasicClasses/Match/Move';
 import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
 //Hosting class
 import Hosting from '../Hosting/Hosting'
+import HostingFirestore from '../Hosting/HostingFirestore'
+
+//Player Phase classes
+import {
+    PlayerCapitalSelectClass,
+    PlayerUpkeepClass,
+    PlayerTurnClass,
+    PlayerResolutionClass
+} from './playerPhases';
 
 class Canvas extends Component {
     constructor(props) {
@@ -26,13 +35,14 @@ class Canvas extends Component {
         //width and height of the board
         this.state = { 
             width: 0, 
-            height: 0
+            height: 0,
+            turn:<div></div>
         }
         //tile size
         this.size = 80;
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
-        this.tileSelect = this.tileSelect.bind(this);
+        this.tileSelectTurn = this.tileSelectTurn.bind(this);
         this.leaveMatch = this.leaveMatch.bind(this);
         this.submitTurn = this.submitTurn.bind(this);
         this.submitHandler = this.submitHandler.bind(this);
@@ -55,6 +65,14 @@ class Canvas extends Component {
         this.turnSubmission = new TurnSubmission()
         //for hosting
         this.hosting = null
+        this.hostFirestore = new HostingFirestore()
+        //for init correct phase class
+        this.phase = null;
+        this.phases = {
+            "Upkeep":PlayerUpkeepClass,
+            "Turn":PlayerTurnClass,
+            "Resolution":PlayerResolutionClass
+        }
     }
 
     componentDidMount(){
@@ -109,7 +127,7 @@ class Canvas extends Component {
             //creates the boards
             this.boardCreation()
             //inits the tileSelection events
-            this.tileSelect();
+            //this.tileSelectTurn();
             //Sets subscription events for rest of the match
             this.gameSubscription()
         //else redirect the user to the correct matchID url
@@ -119,7 +137,7 @@ class Canvas extends Component {
     }
 
     componentWillUnmount(){
-        this.leaveMatch()
+        //this.leaveMatch()
     }
 
     //deletes the instance of the match
@@ -129,31 +147,38 @@ class Canvas extends Component {
         window.location.href=`../..${ROUTES.SEARCH}`
     }
 
-    //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+    //subscripts to the game responsible for rendering the board/units and running the correct methods for the correct phase
     gameSubscription(){
         this.db.collection(DB.MATCHES).doc(this.id)
-            .onSnapshot((doc)=>{
-                if(doc.data() !== undefined){
-                    //reclassing the tiles
-                    var reclassedBoard = this.boardFunctions.reClassifyBoard(doc.data().board)
-                    //reclassing the units
-                    reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
+            .onSnapshot(async (doc)=>{
+                //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+                this.matchUpdates(doc.data())
 
-                    //if the tiles have changed in any way
-                    if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
-                        //rerunning board creation
-                        this.boardCreation();
-                    }
-                    //if the units have changed in any way
-                    if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
-                        //re-rendering units
-                        this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
-                    }
-                    this.setState({board: reclassedBoard})
-                }else{
-                    this.leaveMatch()
-                }
+                this.initCorrectPhase(await this.hostFirestore.checkForMatchPhase(this.matchID))
+                
             })
+    }
+
+    matchUpdates(data){
+        //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+        if(data !== undefined){
+            //reclassing the tiles
+            var reclassedBoard = this.boardFunctions.reClassifyBoard(data.board)
+            //reclassing the units
+            //if the tiles have changed in any way
+            if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
+                //rerunning board creation
+                this.boardCreation();
+            }
+            //if the units have changed in any way
+            if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
+                //re-rendering units
+                this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
+            }
+            this.setState({board: reclassedBoard})
+        }else{
+            this.leaveMatch()
+        }
     }
 
     //Responsible for redrawing the rectangles each time there is an update
@@ -165,7 +190,18 @@ class Canvas extends Component {
         }
     }
 
-    tileSelect(){
+    //Determines which phase game is in and init the correct class
+    initCorrectPhase(phase){
+        if(!phase){
+            this.setState({
+                turn:<PlayerCapitalSelectClass tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+            })
+        }else{
+            //new this.phases[phase]
+        }
+    }
+    
+    tileSelectTurn(){
         var tileMoves = 0,
             targetIndex,
             tile,
@@ -188,6 +224,7 @@ class Canvas extends Component {
                 }
             }
 
+            //boolean that determines whether or not unit has already been assigned a move
             var alreadyHasMove = this.checkUnitForMove(this.BoardUnits.getUnitAtSelectedTile(tile))
             this.BoardUnits.renderDrawMoving(this.size,this.state.board.tiles)
             
@@ -241,6 +278,7 @@ class Canvas extends Component {
         }
     }
 
+    //redraws movement square if unit has already been given a move
     checkUnitForMove(target){
         if(target){
             var output = false;
@@ -293,7 +331,7 @@ class Canvas extends Component {
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <button onClick={this.submitTurn} id='submitButton'>Submit</button>
-                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={[this.state.move,this.turnSubmission,this.state.selectedUnit]} size={this.size} onSubmit={this.submitHandler} onRemove={this.removalHandler} />
+                <div>{this.state.turn}</div>
             </React.Fragment>
         )
     }

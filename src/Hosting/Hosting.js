@@ -43,7 +43,7 @@ export default class Hosting{
         }else{
             this.phase = new this.phases[this.phase]
         }
-        this.moveToNextPhase()
+        //this.moveToNextPhase()
     }
 
     //looks up the present phase and then moves to the next one in order
