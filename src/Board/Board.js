@@ -17,6 +17,8 @@ import BoardUnits from './BoardUnits';
 //Move Classes
 import Move from '../BasicClasses/Match/Move';
 import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
+//Hosting class
+import Hosting from '../Hosting/Hosting'
 
 class Canvas extends Component {
     constructor(props) {
@@ -51,6 +53,8 @@ class Canvas extends Component {
         this.boardFunctions = null
         //for submitting a turn
         this.turnSubmission = new TurnSubmission()
+        //for hosting
+        this.hosting = null
     }
 
     componentDidMount(){
@@ -71,7 +75,9 @@ class Canvas extends Component {
         //getting the matchID from the users profile db
         this.uid = await this.getUID()
         this.matchID = (await this.firestore.getMatchIDFromProfile(this.uid)).match
-        await this.firestore.requestToBeHost(this.matchID,this.uid)
+
+        //Both players make an attempt to claim hosting rights.  First to request gets rights and begins the hosting services
+        if(await this.firestore.requestToBeHost(this.matchID,this.uid)) this.hosting = new Hosting(this.matchID)
         //if the gameID url matches the expected matchID from the users profile then continue
         if(this.matchID===this.id){
             //retrive the matchInfo

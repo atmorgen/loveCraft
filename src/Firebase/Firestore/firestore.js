@@ -134,10 +134,15 @@ class Firestore{
         })
     }
 
-    getMatchHost(matchID){
+    ////These two methods are used to attempt to claim hosting rights
+
+    getMatchHost(matchID,uid){
         return new Promise(resolve =>{
             this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
-                resolve(doc.data().host)
+                if(!doc.data().host || doc.data().host === uid){
+                    resolve(true)
+                }
+                resolve(false)
             }).catch(function(error){
                 console.log(error)
                 resolve()
@@ -147,16 +152,17 @@ class Firestore{
 
     requestToBeHost(matchID,uid){
         return new Promise(async (resolve)=>{
-            if(!(await this.getMatchHost(matchID))){
+            if(await this.getMatchHost(matchID,uid)){
+                
                 this.db.collection(DB.MATCHES).doc(matchID).update({
                     host:uid
                 }).then(function(){
-                    console.log("host claimed!")
-                    resolve()
+                    console.log("Claiming Host!")
+                    resolve(true)
                 })
             }else{
                 console.log('host already claimed!')
-                resolve()
+                resolve(false)
             }
         })
     }
