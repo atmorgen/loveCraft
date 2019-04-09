@@ -50,10 +50,22 @@ export default class CapitalSelectionClass{
             await this.createCapital(player2Sub.submission.position)
             //
             await this.firestore.clearFirebaseSubmissions(this.matchID)
+            await this.setPhaseToUpkeep()
         }
     }
 
     async createCapital(position){
         await this.boardUnits.unitCreation(new MainTown(this.uid,80,position.x,position.y,this.state.ctx,this.state.canvas))
+    }
+
+    setPhaseToUpkeep(){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(this.matchID).update({
+                phase:"Upkeep"
+            }).then(function(){
+                console.log('Moving to Upkeep Phase')
+                resolve()
+            })
+        })
     }
 }
