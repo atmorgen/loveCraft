@@ -164,7 +164,7 @@ class Canvas extends Component {
             //if the units have changed in any way
             if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
                 //re-rendering units
-                this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
+                this.BoardUnits.renderUnits(reclassedBoard.units)
             }
             this.setState({board: reclassedBoard})
         }else{
@@ -188,8 +188,24 @@ class Canvas extends Component {
                 turn:<PlayerCapitalSelectClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
             })
         }else{
-            //new this.phases[phase]
+            if(phase === "Upkeep"){
+                this.setState({
+                    turn:<PlayerUpkeepClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+                })
+            }else if(phase === "Turn"){
+                this.setState({
+                    turn:<PlayerTurnClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+                })
+            }else{
+                this.setState({
+                    turn:<PlayerResolutionClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+                })
+            }
         }
+    }
+
+    createElement(comp){
+        React.createElement(comp)
     }
 
     //Used by phase class to make sure it has the most up to date board
@@ -210,6 +226,7 @@ class Canvas extends Component {
                 <button onClick={this.leaveMatch}>Leave Match</button>
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <canvas id='canvasBoardSelect' ref='selectCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <div>{this.state.turn}</div>
             </React.Fragment>
         )

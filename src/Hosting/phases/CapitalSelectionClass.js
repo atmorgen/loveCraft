@@ -46,14 +46,26 @@ export default class CapitalSelectionClass{
             this.listener()
             var player1Sub = JSON.parse(turnSubmission[0]).submission
             var player2Sub = JSON.parse(turnSubmission[1]).submission
-            await this.createCapital(player1Sub.submission.position)
-            await this.createCapital(player2Sub.submission.position)
-            //
+            await this.createCapital(player1Sub.submission.position,player1Sub.uid)
+            await this.createCapital(player2Sub.submission.position,player2Sub.uid)
+            
             await this.firestore.clearFirebaseSubmissions(this.matchID)
+            await this.setPhaseToUpkeep()
         }
     }
 
-    async createCapital(position){
-        await this.boardUnits.unitCreation(new MainTown(this.uid,80,position.x,position.y,this.state.ctx,this.state.canvas))
+    async createCapital(position,uid){
+        await this.boardUnits.unitCreation(new MainTown(uid,80,position.x,position.y,this.state.ctx,this.state.canvas))
+    }
+
+    setPhaseToUpkeep(){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(this.matchID).update({
+                phase:"Upkeep"
+            }).then(function(){
+                console.log('Moving to Upkeep Phase')
+                resolve()
+            })
+        })
     }
 }

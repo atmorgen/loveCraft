@@ -8,6 +8,8 @@ import PopupMessages from '../../PopupMessages/PopupMessages';
 import Submission from '../Submission';
 import Firestore from '../../../Firebase/Firestore/firestore'
 
+/* This class is responsible for the players submitting their capital location selections for the start of the game */
+
 export default class PlayerCapitalSelectClass extends Component{
     constructor(props){
         super(props)
@@ -25,6 +27,9 @@ export default class PlayerCapitalSelectClass extends Component{
         this.boardFunctions = this.props.boardFunctions
         this.boardUnits = this.props.boardUnits
 
+        //listeners
+        this.listener = null
+
         //firestore
         this.firestore = new Firestore()
 
@@ -38,11 +43,15 @@ export default class PlayerCapitalSelectClass extends Component{
     componentDidUpdate(){
         this.board = this.props.getBoard()
     }
+
+    componentWillUnmount(){
+        //this.listener()
+    }
     
     //highlights the selected tile for capital location decisions
     tileSelectTurn(){
         // eslint-disable-next-line
-        this.tileCanvas.onmousedown = (e)=>{
+        this.listener = this.tileCanvas.onmousedown = (e) =>{
             var clientRect = this.tileCanvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top,
