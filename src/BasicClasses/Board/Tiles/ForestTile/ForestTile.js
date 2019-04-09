@@ -1,5 +1,5 @@
 import TileAbstract from '../TileAbstract'
-import forestImage from './tempForest.png'
+import forestImage from './Tree_TIle_Test.png'
 
 export default class ForestTile extends TileAbstract{
     

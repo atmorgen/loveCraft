@@ -1,0 +1,11 @@
+#popUpMessage{
+    margin: 15px;
+}
+
+#popUpMessageBorder{
+    position: fixed;
+    border: 1px solid maroon;
+    background-color: white;
+    left: 40%;
+    
+}

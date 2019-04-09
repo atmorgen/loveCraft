@@ -1,33 +1,34 @@
 import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt'
+import MainTown from '../BasicClasses/Units/Human/Buildings/MainTown/MainTown';
 import { Firestore } from '../Firebase/Firestore';
 import _ from 'lodash';
 
 import TileData from './TileData/TileData';
 
-//For move submission
-import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
-import Move from '../BasicClasses/Match/Move';
+/* This class is responsible for creation of new units, reclassifying units being pull from firebase and any other small methods needed in regards to units */
 
 class BoardUnits{
     
-    constructor(context,canvas,matchID,uid){
+    constructor(matchID,uid,size){
+        //bindings 
+        this.unitCreation = this.unitCreation.bind(this)
         this.state = {
-            ctx:context,
-            canvas:canvas
+            ctx:document.getElementById('canvasBoardUnit').getContext('2d'),
+            canvas:document.getElementById('canvasBoardUnit')
         }
         this.firestore = new Firestore()
-        this.matchdID = matchID
+        this.matchID = matchID
         this.uid = uid
         this.units = []
+        this.size = size
         this.tileData = new TileData()
-        //this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
 
         this.eldritchTypes = [
             EldritchGrunt
         ]
 
         this.humanTypes = [
-
+            MainTown
         ]
 
         this.druidTypes = [
@@ -35,16 +36,18 @@ class BoardUnits{
         ]
     }
     
-    renderUnits(size,units){
+    renderUnits(units){
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        for(var i = 0;i<units.length;i++){
-            units[i].state.size = size
-            units[i].drawImage()
+        
+        var unitsParsed = units
+        for(var i = 0;i<unitsParsed.length;i++){
+            unitsParsed[i].state.size = this.size
+            unitsParsed[i].drawImage()
         } 
     }
 
-    async unitCreation(unit,matchID){
-        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
+    async unitCreation(unit){
+        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(this.matchID))
         matchUnits.push({
             unitUID:unit.unitUID,
             owner:unit.owner,
@@ -60,7 +63,7 @@ class BoardUnits{
             attack:unit.attack,
             armor:unit.armor
         })
-        this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
+        this.firestore.addUnitsToMatch(this.matchID,JSON.stringify(matchUnits))
     }
 
     reClassifyUnits(board){
@@ -68,25 +71,27 @@ class BoardUnits{
         board.clearUnits()
         for(var i = 0;i<units.length;i++){
             var unit = units[i]
-            
             if(unit.race === "Eldritch"){
                 for(var j = 0;j<this.eldritchTypes.length;j++){
-                    if(this.eldritchTypes[j].name === unit.name.replace(/\s/g,'')){
-                        board.addUnit(new this.eldritchTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                    var classInit = new this.eldritchTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInit)
                         break;
                     }
                 }
             }else if(unit.race === "Human"){
                 for(j = 0;j<this.humanTypes.length;j++){
-                    if(this.humanTypes[j].name === unit.name.replace(/\s/g,'')){
-                        board.addUnit(new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                    var classInit = new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInit)
                         break;
                     }
                 }
             }else if(unit.race === "Druid"){
                 for(j = 0;j<this.druidTypes.length;j++){
-                    if(this.druidTypes[j].name === unit.name.replace(/\s/g,'')){
-                        board.addUnit(new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                    var classInit = new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit()
                         break;
                     }
                 }
@@ -95,24 +100,6 @@ class BoardUnits{
         }
         this.units = units;
         return board
-    }
-
-    async moveUnit(matchID,unit,x,y){
-        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
-        var correctUnit = matchUnits.filter(x =>
-            x.unitUID === unit.unitUID
-        )
-        correctUnit[0].position.x = x
-        correctUnit[0].position.y = y
-
-        //await this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
-
-        if(this.turnSubmission.getMoves().length<2){
-            this.turnSubmission.addMove(new Move(correctUnit[0],x,y))
-        }else{
-            console.log('already submitted 2 moves!')
-        }
-        this.tileData.closeBox()
     }
 
     renderDrawMoving(size,tiles){

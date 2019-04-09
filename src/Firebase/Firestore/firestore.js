@@ -71,7 +71,8 @@ class Firestore{
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHMAKING).add({
                 player:username,
-                id:uid
+                id:uid,
+                ping:null
             }).then(function(doc){
                 console.log("Added to Queue with an ID of: ",doc.id)
                 resolve(doc.id)
@@ -133,15 +134,53 @@ class Firestore{
         })
     }
 
-    /////For Turn Submission//////
+    ////These two methods are used to attempt to claim hosting rights
 
-    submitTurnToMatch(matchID,submission){
-        return new Promise((resolve)=>{
-            this.db.collection(DB.MATCHES).doc(matchID).update({
-                "turnSubmission":firebase.firestore.FieldValue.arrayUnion(submission)
-            }).then(function(){
+    getMatchHost(matchID,uid){
+        return new Promise(resolve =>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                if(!doc.data().host || doc.data().host === uid){
+                    resolve(true)
+                }
+                resolve(false)
+            }).catch(function(error){
+                console.log(error)
                 resolve()
             })
+        })
+    }
+
+    requestToBeHost(matchID,uid){
+        return new Promise(async (resolve)=>{
+            if(await this.getMatchHost(matchID,uid)){
+                
+                this.db.collection(DB.MATCHES).doc(matchID).update({
+                    host:uid
+                }).then(function(){
+                    console.log("Claiming Host!")
+                    resolve(true)
+                })
+            }else{
+                console.log('host already claimed!')
+                resolve(false)
+            }
+        })
+    }
+
+    /////For Turn Submission//////
+
+    submitTurnToMatch(matchID,uid,submission){
+        return new Promise(async (resolve)=>{
+            if(!(await this.checkIfAlreadySubmitted(matchID,uid))){
+                this.db.collection(DB.MATCHES).doc(matchID).update({
+                    "turnSubmission":firebase.firestore.FieldValue.arrayUnion(JSON.stringify(submission))
+                }).then(function(){
+                    resolve()
+                })
+            }else{
+                console.log('You\'ve already submitted a turn')
+                resolve()
+            }            
         })
     }
 
@@ -149,13 +188,21 @@ class Firestore{
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
                 var submissions = doc.data().turnSubmission
-                
                 for(var i = 0;i<submissions.length;i++){
-                    var submission = JSON.parse(submissions[i])
-                    
+                    var submission = JSON.parse(submissions[i]).submission
                     if(uid === submission.uid) resolve(true)
                 }
                 resolve(false)
+            })
+        })
+    }
+
+    clearFirebaseSubmissions(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).update({
+                turnSubmission:[]
+            }).then(function(){
+                resolve()
             })
         })
     }

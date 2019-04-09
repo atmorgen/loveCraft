@@ -10,13 +10,20 @@ import * as DB from '../Firebase/Firestore/DB';
 import * as ROUTES from '../Routes/routes';
 //Functions
 import BoardFunctions from './BoardFunctions'
-//Tile UI Component
-import TileData from './TileData/TileData';
 //Unit Functions
 import BoardUnits from './BoardUnits';
-//Move Classes
-import Move from '../BasicClasses/Match/Move';
 import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
+//Hosting class
+import Hosting from '../Hosting/Hosting'
+import HostingFirestore from '../Hosting/HostingFirestore'
+
+//Player Phase classes
+import {
+    PlayerCapitalSelectClass,
+    PlayerUpkeepClass,
+    PlayerTurnClass,
+    PlayerResolutionClass
+} from './playerPhases';
 
 class Canvas extends Component {
     constructor(props) {
@@ -24,17 +31,15 @@ class Canvas extends Component {
         //width and height of the board
         this.state = { 
             width: 0, 
-            height: 0
+            height: 0,
+            turn:<div></div>
         }
         //tile size
         this.size = 80;
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
-        this.tileSelect = this.tileSelect.bind(this);
         this.leaveMatch = this.leaveMatch.bind(this);
-        this.submitTurn = this.submitTurn.bind(this);
-        this.submitHandler = this.submitHandler.bind(this);
-        this.removalHandler = this.removalHandler.bind(this);
+        this.getBoard = this.getBoard.bind(this)
         //Firestore
         this.firestore = new Firestore()
         this.id = this.props.match.params.gameID;
@@ -51,10 +56,20 @@ class Canvas extends Component {
         this.boardFunctions = null
         //for submitting a turn
         this.turnSubmission = new TurnSubmission()
+        //for hosting
+        this.hosting = null
+        this.hostFirestore = new HostingFirestore()
+        //for init correct phase class
+        this.phases = {
+            "Upkeep":PlayerUpkeepClass,
+            "Turn":PlayerTurnClass,
+            "Resolution":PlayerResolutionClass
+        }
     }
 
     componentDidMount(){
         this.gameInit()
+        
     }
 
     getUID(){
@@ -71,6 +86,8 @@ class Canvas extends Component {
         this.uid = await this.getUID()
         this.matchID = (await this.firestore.getMatchIDFromProfile(this.uid)).match
 
+        //Both players make an attempt to claim hosting rights.  First to request gets rights and begins the hosting services
+        if(await this.firestore.requestToBeHost(this.matchID,this.uid)) this.hosting = new Hosting(this.matchID,this.uid)
         //if the gameID url matches the expected matchID from the users profile then continue
         if(this.matchID===this.id){
             //retrive the matchInfo
@@ -90,7 +107,7 @@ class Canvas extends Component {
                 })
             this.boardFunctions = new BoardFunctions(this.state.tileCanvas.ctx,this.state.tileCanvas.canvas)
             //creates the units on the board
-            this.BoardUnits = new BoardUnits(this.state.unitCanvas.ctx,this.state.unitCanvas.canvas,this.matchID,this.uid)
+            this.BoardUnits = new BoardUnits(this.matchID,this.uid,this.size)
             //reclassifies tiles
             var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
             //reclassifies units
@@ -101,8 +118,6 @@ class Canvas extends Component {
             this.updateWindowDimensions(this.state.board.size)
             //creates the boards
             this.boardCreation()
-            //inits the tileSelection events
-            this.tileSelect();
             //Sets subscription events for rest of the match
             this.gameSubscription()
         //else redirect the user to the correct matchID url
@@ -112,7 +127,7 @@ class Canvas extends Component {
     }
 
     componentWillUnmount(){
-        this.leaveMatch()
+        //this.leaveMatch()
     }
 
     //deletes the instance of the match
@@ -122,31 +137,39 @@ class Canvas extends Component {
         window.location.href=`../..${ROUTES.SEARCH}`
     }
 
-    //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+    //subscripts to the game responsible for rendering the board/units and running the correct methods for the correct phase
     gameSubscription(){
         this.db.collection(DB.MATCHES).doc(this.id)
-            .onSnapshot((doc)=>{
-                if(doc.data() !== undefined){
-                    //reclassing the tiles
-                    var reclassedBoard = this.boardFunctions.reClassifyBoard(doc.data().board)
-                    //reclassing the units
-                    reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
+            .onSnapshot(async (doc)=>{
+                //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+                this.matchUpdates(doc.data())
 
-                    //if the tiles have changed in any way
-                    if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
-                        //rerunning board creation
-                        this.boardCreation();
-                    }
-                    //if the units have changed in any way
-                    if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
-                        //re-rendering units
-                        this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
-                    }
-                    this.setState({board: reclassedBoard})
-                }else{
-                    this.leaveMatch()
-                }
+                this.initCorrectPhase(await this.hostFirestore.checkForMatchPhase(this.matchID))
+                
             })
+    }
+
+    matchUpdates(data){
+        //Responsible for updating this.state.board everytime there is an update to the DB.MATCHES board
+        if(data !== undefined){
+            //reclassing the tiles
+            var reclassedBoard = this.boardFunctions.reClassifyBoard(data.board)
+            reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
+            //reclassing the units
+            //if the tiles have changed in any way
+            if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
+                //rerunning board creation
+                this.boardCreation();
+            }
+            //if the units have changed in any way
+            if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
+                //re-rendering units
+                this.BoardUnits.renderUnits(this.size,reclassedBoard.units)
+            }
+            this.setState({board: reclassedBoard})
+        }else{
+            this.leaveMatch()
+        }
     }
 
     //Responsible for redrawing the rectangles each time there is an update
@@ -158,129 +181,27 @@ class Canvas extends Component {
         }
     }
 
-    tileSelect(){
-        var tileMoves = 0,
-            targetIndex,
-            tile,
-            move;
-        // eslint-disable-next-line
-        this.state.tileCanvas.canvas.onmousedown = (e)=>{
-
-            var clientRect = this.state.tileCanvas.canvas.getBoundingClientRect(),
-            x = e.clientX - clientRect.left,
-            y = e.clientY - clientRect.top,
-            i;
-            for(i = 0;i<this.state.board.tiles.length;i++){
-                tile = this.state.board.tiles[i];
-                
-                if(this.boardFunctions.withinTile(tile,x,y,this.size)) {
-                    this.selectionIndex = i;
-                    this.BoardUnits.renderUnits(this.size,this.state.board.units)
-                    tile.drawSelection(this.size,this.state.unitCanvas.ctx)
-                    break;
-                }
-            }
-
-            var alreadyHasMove = this.checkUnitForMove(this.BoardUnits.getUnitAtSelectedTile(tile))
-            this.BoardUnits.renderDrawMoving(this.size,this.state.board.tiles)
-            
-            if(tile.getIsMoveable()){
-                if(!move) {
-                    move = new Move(this.state.selectedUnit,targetIndex)
-                }
-                if(tileMoves < move.getUnit().speed){
-                    move.addNewPosition(i)
-                    tile.drawMoving(this.size,this.state.unitCanvas.ctx)
-                    if(tileMoves+1 < move.getUnit().speed){
-                        this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)
-                    }
-                    this.setState({
-                        move:move
-                    })
-                    tileMoves++
-                } 
-            }else{
-                this.clearMovingItems()
-                move = null
-                tileMoves = 0
-                move = null
-                targetIndex = null
-                this.setState({
-                    selectedTile:this.state.board.tiles[i],
-                    move:null
-                })
-            }
-            
-            
-            if(!move){
-                this.setState({
-                    selectedUnit:this.BoardUnits.getUnitAtSelectedTile(tile)
-                })
-                targetIndex = i
-            }
-
-            if(!alreadyHasMove){
-                if(this.state.selectedUnit){
-                    if(this.state.selectedUnit.owner === this.uid){
-                        if(tileMoves < this.state.selectedUnit.speed){
-                            this.boardFunctions.getSurroundingTiles(this.state.board,i,this.size,this.state.unitCanvas.ctx)                    
-                        }
-                    }
-                }
-            }else{
-
-            }
-            
+    //Determines which phase game is in and init the correct class
+    initCorrectPhase(phase){
+        if(!phase){
+            this.setState({
+                turn:<PlayerCapitalSelectClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+            })
+        }else{
+            //new this.phases[phase]
         }
     }
 
-    checkUnitForMove(target){
-        if(target){
-            var output = false;
-            for(var i = 0;i<this.turnSubmission.moves.length;i++){
-                var move = this.turnSubmission.moves[i].move
-                if(move.unit.unitUID === target.unitUID){
-                    for(var j = 0;j<move.moves.length;j++){
-                        this.state.board.tiles[move.moves[j].index].drawMoving(this.size,this.state.unitCanvas.ctx)
-                    }
-                    output = true                    
-                }
-            }
-            return output
-        }
+    //Used by phase class to make sure it has the most up to date board
+    getBoard(){
+        return this.state.board
     }
+    
 
     updateWindowDimensions(input) {
         var size = this.size*input
         this.setState({ width: size, height: size })
     }
-
-    clearMovingItems(){
-        for(var i = 0;i<this.state.board.tiles.length;i++){
-            this.state.board.tiles[i].setIsMoveableToFalse()
-            this.state.board.tiles[i].setMovingToToFalse()
-        }
-    }
-
-    submitHandler(value){
-        this.turnSubmission.addMove(value[0])
-        this.BoardUnits.renderUnits(this.size,this.state.board.units)
-        document.getElementById('tileDataBox').style.display = 'none';
-    }
-
-    removalHandler(value){
-        this.turnSubmission.removeMove(value[2].unitUID)
-        document.getElementById('tileDataBox').style.display = 'none';
-    }
-
-    submitTurn(){
-        this.turnSubmission.submitTurn(this.matchID,this.uid)
-        this.turnSubmission.clearMoves()
-    }
-
-    
-
-     
 
     render() {
         return (
@@ -289,8 +210,7 @@ class Canvas extends Component {
                 <button onClick={this.leaveMatch}>Leave Match</button>
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
-                <button onClick={this.submitTurn} id='submitButton'>Submit</button>
-                <TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={[this.state.move,this.turnSubmission,this.state.selectedUnit]} size={this.size} onSubmit={this.submitHandler} onRemove={this.removalHandler} />
+                <div>{this.state.turn}</div>
             </React.Fragment>
         )
     }
