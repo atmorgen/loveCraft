@@ -10,8 +10,9 @@ import {
 /* This class is responsible for handling the Hosting Responsibilities.  Including data processing and phase determination */
 
 export default class Hosting{
-    constructor(matchID){
+    constructor(matchID,uid){
         this.matchID = matchID
+        this.uid = uid
         this.hostingFirestore = new HostingFirestore()
         
         //bindings
@@ -39,7 +40,7 @@ export default class Hosting{
         this.phase = await this.hostingFirestore.checkForMatchPhase(this.matchID)
         
         if(!this.phase){
-            this.phase = new CapitalSelectionClass()
+            this.phase = new CapitalSelectionClass(this.matchID,this.uid)
         }else{
             this.phase = new this.phases[this.phase]()
         }

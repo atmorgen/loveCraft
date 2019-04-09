@@ -4,35 +4,51 @@ import './PlayerCapitalSelectClass.css'
 //Popup Component
 import PopupMessages from '../../PopupMessages/PopupMessages';
 
+//for submission
+import Submission from '../Submission';
+import Firestore from '../../../Firebase/Firestore/firestore'
+
 export default class PlayerCapitalSelectClass extends Component{
     constructor(props){
         super(props)
+        //bindings
         this.tileSelectTurn = this.tileSelectTurn.bind(this)
+        this.submitTurn = this.submitTurn.bind(this)
+
+        //props
         this.tileCanvas = this.props.tileCanvas
         this.unitCtx = this.props.unitCtx
         this.board = this.props.board
         this.size = this.props.size
+        this.matchID = this.props.matchID
+        this.uid = this.props.uid
+        this.boardFunctions = this.props.boardFunctions
+        this.boardUnits = this.props.boardUnits
+
+        //firestore
+        this.firestore = new Firestore()
 
         this.state = {
 
         }
-        this.boardFunctions = this.props.boardFunctions
-        this.boardUnits = this.props.boardUnits
-        console.log("Player Capital Selection Start")
         this.tileSelectTurn()
     }
+
+    //anytime the component updates it gets the most reason board from the board class to make sure they match
+    componentDidUpdate(){
+        this.board = this.props.getBoard()
+    }
     
+    //highlights the selected tile for capital location decisions
     tileSelectTurn(){
-        var tile
         // eslint-disable-next-line
-        
         this.tileCanvas.onmousedown = (e)=>{
             var clientRect = this.tileCanvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top,
             i;
             for(i = 0;i<this.board.tiles.length;i++){
-                tile = this.board.tiles[i];
+                var tile = this.board.tiles[i];
                 
                 if(this.boardFunctions.withinTile(tile,x,y,this.size)) {
                     this.selectionIndex = i;
@@ -42,45 +58,16 @@ export default class PlayerCapitalSelectClass extends Component{
                 }
             }
             this.setState({
-                selectedTile:this.board.tiles[i],
-                move:null
+                selectedTile:this.board.tiles[i]
             })
 
         }
     }
 
-    //redraws movement square if unit has already been given a move
-    checkUnitForMove(target){
-        if(target){
-            var output = false;
-            for(var i = 0;i<this.turnSubmission.moves.length;i++){
-                var move = this.turnSubmission.moves[i].move
-                if(move.unit.unitUID === target.unitUID){
-                    for(var j = 0;j<move.moves.length;j++){
-                        this.board.tiles[move.moves[j].index].drawMoving(this.size,this.unitCtx)
-                    }
-                    output = true                    
-                }
-            }
-            return output
-        }
-    }
-
-    submitHandler(value){
-        this.turnSubmission.addMove(value[0])
-        this.BoardUnits.renderUnits(this.size,this.state.board.units)
-        document.getElementById('tileDataBox').style.display = 'none';
-    }
-
-    removalHandler(value){
-        this.turnSubmission.removeMove(value[2].unitUID)
-        document.getElementById('tileDataBox').style.display = 'none';
-    }
-
     submitTurn(){
-        console.log('submit')
-        //this.turnSubmission.submitTurn(this.matchID,this.uid)
-        //this.turnSubmission.clearMoves()
+        var submission = new Submission(this.state.selectedTile,this.uid)
+        this.firestore.submitTurnToMatch(this.matchID,this.uid,submission)
+        document.getElementById('popUpMessageBorder').style.display = 'none'
     }
     
     render() {

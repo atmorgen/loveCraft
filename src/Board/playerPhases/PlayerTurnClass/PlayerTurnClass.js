@@ -79,4 +79,21 @@ export default class PlayerTurnClass{
             
         }
     }
+
+    //redraws movement square if unit has already been given a move
+    checkUnitForMove(target){
+        if(target){
+            var output = false;
+            for(var i = 0;i<this.turnSubmission.moves.length;i++){
+                var move = this.turnSubmission.moves[i].move
+                if(move.unit.unitUID === target.unitUID){
+                    for(var j = 0;j<move.moves.length;j++){
+                        this.board.tiles[move.moves[j].index].drawMoving(this.size,this.unitCtx)
+                    }
+                    output = true                    
+                }
+            }
+            return output
+        }
+    }
 }

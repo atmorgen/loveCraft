@@ -1,4 +1,5 @@
 import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt'
+import MainTown from '../BasicClasses/Units/Human/Buildings/MainTown/MainTown';
 import { Firestore } from '../Firebase/Firestore';
 import _ from 'lodash';
 
@@ -6,13 +7,15 @@ import TileData from './TileData/TileData';
 
 class BoardUnits{
     
-    constructor(context,canvas,matchID,uid){
+    constructor(matchID,uid){
+        //bindings 
+        this.unitCreation = this.unitCreation.bind(this)
         this.state = {
-            ctx:context,
-            canvas:canvas
+            ctx:document.getElementById('canvasBoardUnit').getContext('2d'),
+            canvas:document.getElementById('canvasBoardUnit')
         }
         this.firestore = new Firestore()
-        this.matchdID = matchID
+        this.matchID = matchID
         this.uid = uid
         this.units = []
         this.tileData = new TileData()
@@ -23,7 +26,7 @@ class BoardUnits{
         ]
 
         this.humanTypes = [
-
+            MainTown
         ]
 
         this.druidTypes = [
@@ -33,15 +36,16 @@ class BoardUnits{
     
     renderUnits(size,units){
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
-        var unitsParsed = JSON.parse(units)
+        
+        var unitsParsed = units// units.length !== 0 ? JSON.parse(units) : units
         for(var i = 0;i<unitsParsed.length;i++){
             unitsParsed[i].state.size = size
             unitsParsed[i].drawImage()
         } 
     }
 
-    async unitCreation(unit,matchID){
-        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(matchID))
+    async unitCreation(unit){
+        var matchUnits = JSON.parse(await this.firestore.getUnitsFromMatch(this.matchID))
         matchUnits.push({
             unitUID:unit.unitUID,
             owner:unit.owner,
@@ -57,7 +61,7 @@ class BoardUnits{
             attack:unit.attack,
             armor:unit.armor
         })
-        this.firestore.addUnitsToMatch(this.matchdID,JSON.stringify(matchUnits))
+        this.firestore.addUnitsToMatch(this.matchID,JSON.stringify(matchUnits))
     }
 
     reClassifyUnits(board){

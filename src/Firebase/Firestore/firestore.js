@@ -169,13 +169,18 @@ class Firestore{
 
     /////For Turn Submission//////
 
-    submitTurnToMatch(matchID,submission){
-        return new Promise((resolve)=>{
-            this.db.collection(DB.MATCHES).doc(matchID).update({
-                "turnSubmission":firebase.firestore.FieldValue.arrayUnion(submission)
-            }).then(function(){
+    submitTurnToMatch(matchID,uid,submission){
+        return new Promise(async (resolve)=>{
+            if(!(await this.checkIfAlreadySubmitted(matchID,uid))){
+                this.db.collection(DB.MATCHES).doc(matchID).update({
+                    "turnSubmission":firebase.firestore.FieldValue.arrayUnion(JSON.stringify(submission))
+                }).then(function(){
+                    resolve()
+                })
+            }else{
+                console.log('You\'ve already submitted a turn')
                 resolve()
-            })
+            }            
         })
     }
 
@@ -183,13 +188,21 @@ class Firestore{
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
                 var submissions = doc.data().turnSubmission
-                
                 for(var i = 0;i<submissions.length;i++){
-                    var submission = JSON.parse(submissions[i])
-                    
+                    var submission = JSON.parse(submissions[i]).submission
                     if(uid === submission.uid) resolve(true)
                 }
                 resolve(false)
+            })
+        })
+    }
+
+    clearFirebaseSubmissions(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).update({
+                turnSubmission:[]
+            }).then(function(){
+                resolve()
             })
         })
     }

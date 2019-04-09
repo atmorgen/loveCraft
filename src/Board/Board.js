@@ -39,6 +39,7 @@ class Canvas extends Component {
         //Bindings
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.leaveMatch = this.leaveMatch.bind(this);
+        this.getBoard = this.getBoard.bind(this)
         //Firestore
         this.firestore = new Firestore()
         this.id = this.props.match.params.gameID;
@@ -59,7 +60,6 @@ class Canvas extends Component {
         this.hosting = null
         this.hostFirestore = new HostingFirestore()
         //for init correct phase class
-        this.phase = null;
         this.phases = {
             "Upkeep":PlayerUpkeepClass,
             "Turn":PlayerTurnClass,
@@ -87,7 +87,7 @@ class Canvas extends Component {
         this.matchID = (await this.firestore.getMatchIDFromProfile(this.uid)).match
 
         //Both players make an attempt to claim hosting rights.  First to request gets rights and begins the hosting services
-        if(await this.firestore.requestToBeHost(this.matchID,this.uid)) this.hosting = new Hosting(this.matchID)
+        if(await this.firestore.requestToBeHost(this.matchID,this.uid)) this.hosting = new Hosting(this.matchID,this.uid)
         //if the gameID url matches the expected matchID from the users profile then continue
         if(this.matchID===this.id){
             //retrive the matchInfo
@@ -107,7 +107,7 @@ class Canvas extends Component {
                 })
             this.boardFunctions = new BoardFunctions(this.state.tileCanvas.ctx,this.state.tileCanvas.canvas)
             //creates the units on the board
-            this.BoardUnits = new BoardUnits(this.state.unitCanvas.ctx,this.state.unitCanvas.canvas,this.matchID,this.uid)
+            this.BoardUnits = new BoardUnits(this.matchID,this.uid)
             //reclassifies tiles
             var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
             //reclassifies units
@@ -118,8 +118,6 @@ class Canvas extends Component {
             this.updateWindowDimensions(this.state.board.size)
             //creates the boards
             this.boardCreation()
-            //inits the tileSelection events
-            //this.tileSelectTurn();
             //Sets subscription events for rest of the match
             this.gameSubscription()
         //else redirect the user to the correct matchID url
@@ -156,6 +154,7 @@ class Canvas extends Component {
         if(data !== undefined){
             //reclassing the tiles
             var reclassedBoard = this.boardFunctions.reClassifyBoard(data.board)
+            reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
             //reclassing the units
             //if the tiles have changed in any way
             if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
@@ -186,24 +185,22 @@ class Canvas extends Component {
     initCorrectPhase(phase){
         if(!phase){
             this.setState({
-                turn:<PlayerCapitalSelectClass tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+                turn:<PlayerCapitalSelectClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
             })
         }else{
             //new this.phases[phase]
         }
+    }
+
+    //Used by phase class to make sure it has the most up to date board
+    getBoard(){
+        return this.state.board
     }
     
 
     updateWindowDimensions(input) {
         var size = this.size*input
         this.setState({ width: size, height: size })
-    }
-
-    clearMovingItems(){
-        for(var i = 0;i<this.state.board.tiles.length;i++){
-            this.state.board.tiles[i].setIsMoveableToFalse()
-            this.state.board.tiles[i].setMovingToToFalse()
-        }
     }
 
     render() {
