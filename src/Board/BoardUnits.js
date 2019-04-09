@@ -1,5 +1,16 @@
-import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt'
+//Unit Imports for now until indexes are set up
+
+//Druids
+import SwineKnight from '../BasicClasses/Units/Druid/Soldier/SwineKnight';
+import DruidGatherer from '../BasicClasses/Units/Druid/Gatherer/DruidGatherer';
+
+//Eldritch
+import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt';
+import Cultist from '../BasicClasses/Units/Eldritch/Scout/Cultist';
+
+//Humans
 import MainTown from '../BasicClasses/Units/Human/Buildings/MainTown/MainTown';
+
 import { Firestore } from '../Firebase/Firestore';
 import _ from 'lodash';
 
@@ -24,7 +35,8 @@ class BoardUnits{
         this.tileData = new TileData()
 
         this.eldritchTypes = [
-            EldritchGrunt
+            EldritchGrunt,
+            Cultist
         ]
 
         this.humanTypes = [
@@ -32,7 +44,8 @@ class BoardUnits{
         ]
 
         this.druidTypes = [
-
+            DruidGatherer,
+            SwineKnight
         ]
     }
     
@@ -49,7 +62,7 @@ class BoardUnits{
         matchUnits.push({
             unitUID:unit.unitUID,
             owner:unit.owner,
-            username:localStorage.getItem('username'),
+            username:(await this.firestore.getUserName(unit.owner)),// localStorage.getItem('username'),
             race:unit.race,
             name:unit.name,
             position:{
@@ -89,7 +102,7 @@ class BoardUnits{
                 for(j = 0;j<this.druidTypes.length;j++){
                     var classInit = new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
                     if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
-                        board.addUnit()
+                        board.addUnit(classInit)
                         break;
                     }
                 }

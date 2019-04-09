@@ -45,13 +45,13 @@ export default class PlayerCapitalSelectClass extends Component{
     }
 
     componentWillUnmount(){
-        this.listener()
+        //this.listener()
     }
     
     //highlights the selected tile for capital location decisions
     tileSelectTurn(){
         // eslint-disable-next-line
-        this.listener = this.tileCanvas.onmousedown = (e)=>{
+        this.listener = this.tileCanvas.onmousedown = (e) =>{
             var clientRect = this.tileCanvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top,

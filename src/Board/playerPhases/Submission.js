@@ -1,9 +1,10 @@
 export default class Submission{
 
-    constructor(sub,uid){
+    constructor(sub,uid,username){
         this.submission={
             submission:sub,
-            uid:uid
+            uid:uid,
+            username:username
         }      
     }
 

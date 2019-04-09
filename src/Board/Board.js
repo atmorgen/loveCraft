@@ -226,6 +226,7 @@ class Canvas extends Component {
                 <button onClick={this.leaveMatch}>Leave Match</button>
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <canvas id='canvasBoardSelect' ref='selectCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <div>{this.state.turn}</div>
             </React.Fragment>
         )

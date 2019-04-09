@@ -17,7 +17,7 @@
     pointer-events:none;
 }
 
-#canvasBoardSelection{
+#canvasBoardSelect{
     position: absolute;
     margin: 50px;
     border-style: solid;
@@ -25,9 +25,4 @@
     border-color: maroon;
     background-color: transparent;
     pointer-events:none;
-}
-
-#offCanvas{
-    height:0;
-    width:0;
 }
