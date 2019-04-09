@@ -52,7 +52,7 @@ export default class PlayerCapitalSelectClass extends Component{
                 
                 if(this.boardFunctions.withinTile(tile,x,y,this.size)) {
                     this.selectionIndex = i;
-                    this.boardUnits.renderUnits(this.size,this.board.units)
+                    this.boardUnits.renderUnits(this.board.units)
                     tile.drawSelection(this.size,this.unitCtx)
                     break;
                 }

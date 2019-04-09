@@ -11,7 +11,7 @@ export default class FertileSoil extends TileAbstract{
         this.image = null;
         this.classType = 'FertileSoil';
         this.img = grass;
-        this.imgSize = 240;
+        this.imgSize = 256;
     }
 
     getClassType(){

@@ -28,7 +28,6 @@ export default class Unit{
     drawImage(){
         var img = new Image();
             img.src = this.img;
-        
         img.onload = () =>{
             this.context.drawImage(img,
                 this.pixelsLeft,

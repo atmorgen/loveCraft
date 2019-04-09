@@ -14,6 +14,7 @@ class MainTown extends UnitAbstract{
         this.state = {
             size: size
         }
+        
         this.img = building
         this.position = {
             x:x,

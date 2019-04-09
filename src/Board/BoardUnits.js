@@ -5,9 +5,11 @@ import _ from 'lodash';
 
 import TileData from './TileData/TileData';
 
+/* This class is responsible for creation of new units, reclassifying units being pull from firebase and any other small methods needed in regards to units */
+
 class BoardUnits{
     
-    constructor(matchID,uid){
+    constructor(matchID,uid,size){
         //bindings 
         this.unitCreation = this.unitCreation.bind(this)
         this.state = {
@@ -18,8 +20,8 @@ class BoardUnits{
         this.matchID = matchID
         this.uid = uid
         this.units = []
+        this.size = size
         this.tileData = new TileData()
-        //this.unitCreation(new EldritchGrunt(this.uid,this.size,4,4,this.state.ctx,this.state.canvas),this.matchdID)
 
         this.eldritchTypes = [
             EldritchGrunt
@@ -34,12 +36,12 @@ class BoardUnits{
         ]
     }
     
-    renderUnits(size,units){
+    renderUnits(units){
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
         
-        var unitsParsed = units// units.length !== 0 ? JSON.parse(units) : units
+        var unitsParsed = units
         for(var i = 0;i<unitsParsed.length;i++){
-            unitsParsed[i].state.size = size
+            unitsParsed[i].state.size = this.size
             unitsParsed[i].drawImage()
         } 
     }
@@ -69,25 +71,27 @@ class BoardUnits{
         board.clearUnits()
         for(var i = 0;i<units.length;i++){
             var unit = units[i]
-            
             if(unit.race === "Eldritch"){
                 for(var j = 0;j<this.eldritchTypes.length;j++){
-                    if(this.eldritchTypes[j].name === unit.name.replace(/\s/g,'')){
-                        board.addUnit(new this.eldritchTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                    var classInit = new this.eldritchTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInit)
                         break;
                     }
                 }
             }else if(unit.race === "Human"){
                 for(j = 0;j<this.humanTypes.length;j++){
-                    if(this.humanTypes[j].name === unit.name.replace(/\s/g,'')){
-                        board.addUnit(new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                    var classInit = new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInit)
                         break;
                     }
                 }
             }else if(unit.race === "Druid"){
                 for(j = 0;j<this.druidTypes.length;j++){
-                    if(this.druidTypes[j].name === unit.name.replace(/\s/g,'')){
-                        board.addUnit(new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas))
+                    var classInit = new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit()
                         break;
                     }
                 }

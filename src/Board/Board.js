@@ -107,7 +107,7 @@ class Canvas extends Component {
                 })
             this.boardFunctions = new BoardFunctions(this.state.tileCanvas.ctx,this.state.tileCanvas.canvas)
             //creates the units on the board
-            this.BoardUnits = new BoardUnits(this.matchID,this.uid)
+            this.BoardUnits = new BoardUnits(this.matchID,this.uid,this.size)
             //reclassifies tiles
             var boardReclassified = this.boardFunctions.reClassifyBoard(matchInfo.board)
             //reclassifies units
