@@ -4,8 +4,6 @@ import React, { Component } from 'react';
 import PopupMessages from '../../PopupMessages/PopupMessages';
 
 //for submission
-import Submission from '../Submission';
-import Firestore from '../../../Firebase/Firestore/firestore'
 
 //unit tests
 import EldritchGrunt from '../../../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt'

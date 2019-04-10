@@ -33,8 +33,8 @@ class SwineKnight extends UnitAbstract{
         this.bitMapLength = 3
 
         //these should match the size of each SEPERATE image on the bitmap, i.e. if it's three 32x32 images on the bitmap then the spriteWidth and spriteHeight should be 32
-        this.spriteWidth  = 125
-        this.spriteHeight = 125
+        this.spriteWidth  = 252
+        this.spriteHeight = 252
 
         //These determine where we are looking on the actual bitmap image.  If it's top to bottom and the images are 32x32 then to go to the next image you will set pixelsTop
         //to ```pixelsTops+=spriteHeight``` to get to the next image
