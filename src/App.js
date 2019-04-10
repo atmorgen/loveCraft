@@ -18,7 +18,7 @@ const App = () => {
     return (
         <Router>
           <Header />
-
+          
           <hr />
           
           <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
