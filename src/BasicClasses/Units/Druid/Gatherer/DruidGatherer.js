@@ -1,4 +1,4 @@
-import druidGatherer from './druidGatherer(front).png'
+import druidGatherer from './druidGatherer.png'
 import UnitAbstract from '../../UnitAbstract'
 
 class DruidGatherer extends UnitAbstract{
@@ -30,7 +30,7 @@ class DruidGatherer extends UnitAbstract{
         }
         this.context = context
         this.canvas = canvas
-        this.bitMapLength = 3
+        this.bitMapLength = 2
 
         //these should match the size of each SEPERATE image on the bitmap, i.e. if it's three 32x32 images on the bitmap then the spriteWidth and spriteHeight should be 32
         this.spriteWidth  = 256

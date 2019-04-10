@@ -84,25 +84,25 @@ class BoardUnits{
             var unit = units[i]
             if(unit.race === "Eldritch"){
                 for(var j = 0;j<this.eldritchTypes.length;j++){
-                    var classInit = new this.eldritchTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
-                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
-                        board.addUnit(classInit)
+                    var classInitEldritch = new this.eldritchTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInitEldritch.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInitEldritch)
                         break;
                     }
                 }
             }else if(unit.race === "Human"){
                 for(j = 0;j<this.humanTypes.length;j++){
-                    var classInit = new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
-                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
-                        board.addUnit(classInit)
+                    var classInitHuman = new this.humanTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInitHuman.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInitHuman)
                         break;
                     }
                 }
             }else if(unit.race === "Druid"){
                 for(j = 0;j<this.druidTypes.length;j++){
-                    var classInit = new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
-                    if(classInit.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
-                        board.addUnit(classInit)
+                    var classInitDruid = new this.druidTypes[j](this.uid,null,unit.position.x,unit.position.y,this.state.ctx,this.state.canvas)
+                    if(classInitDruid.name.replace(/\s/g,'') === unit.name.replace(/\s/g,'')){
+                        board.addUnit(classInitDruid)
                         break;
                     }
                 }
