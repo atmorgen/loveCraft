@@ -43,10 +43,6 @@ export default class PlayerCapitalSelectClass extends Component{
     componentDidUpdate(){
         this.board = this.props.getBoard()
     }
-
-    componentWillUnmount(){
-        //this.listener()
-    }
     
     //highlights the selected tile for capital location decisions
     tileSelectTurn(){
@@ -75,8 +71,9 @@ export default class PlayerCapitalSelectClass extends Component{
 
     submitTurn(){
         var submission = new Submission(this.state.selectedTile,this.uid)
-        this.firestore.submitTurnToMatch(this.matchID,this.uid,submission)
+        this.firestore.submitTurnToMatch(this.matchID,this.uid,JSON.stringify(submission))
         document.getElementById('popUpMessageBorder').style.display = 'none'
+        this.listener()
     }
     
     render() {

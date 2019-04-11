@@ -3,9 +3,9 @@ import grass from './Grass_Tile_Test.png'
 
 export default class FertileSoil extends TileAbstract{
 
-    constructor(x,y,fertility){
+    constructor(x,y){
         super(x,y)
-        this.fertility = fertility;
+        this.resourceCount = 10;
         this.seedType = null;
         this.color = "green";
         this.image = null;
@@ -18,20 +18,20 @@ export default class FertileSoil extends TileAbstract{
         return this.classType
     }
 
-    getFertility(){
-        return this.fertility;
+    getresourceCount(){
+        return this.resourceCount;
     }
 
-    increaseFertility(){
-        this.fertility++;
+    increaseresourceCount(){
+        this.resourceCount++;
     }
 
-    decreaseFertility(){
-        this.fertility--;
+    decreaseresourceCount(){
+        this.resourceCount--;
     }
 
-    setFertilityToZero(){
-        this.fertility = 0;
+    setresourceCountToZero(){
+        this.resourceCount = 0;
     }
 
     getSeedType(){

@@ -180,7 +180,7 @@ class Canvas extends Component {
         this.state.tileCanvas.ctx.clearRect(0, 0, this.state.tileCanvas.canvas.width, this.state.tileCanvas.canvas.height);
         for(var i = 0;i<this.state.board.tiles.length;i++){
             var tile = this.state.board.tiles[i]
-            tile.drawImg(false,this.size,this.state.tileCanvas.ctx)
+            tile.drawImg(this.size,this.state.tileCanvas.ctx)
         }
     }
 

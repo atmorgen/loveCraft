@@ -7,8 +7,25 @@ export default class ForestTile extends TileAbstract{
         super(x,y)
         this.color = "darkgreen";
         this.classType = 'Forest';
+        this.resourceCount = 5;
         this.img = forestImage;
         this.imgSize = 256;
+    }
+
+    getresourceCount(){
+        return this.resourceCount;
+    }
+
+    increaseresourceCount(){
+        this.resourceCount++;
+    }
+
+    decreaseresourceCount(){
+        this.resourceCount--;
+    }
+
+    setresourceCountToZero(){
+        this.resourceCount = 0;
     }
 
     getClassType(){
