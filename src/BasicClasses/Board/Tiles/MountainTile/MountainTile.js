@@ -1,5 +1,5 @@
 import TileAbstract from '../TileAbstract'
-import stoneImage from './mountain.png'
+import stoneImage from './Stone_Tile_2.png'
 
 export default class MountainTile extends TileAbstract{
     
@@ -9,7 +9,7 @@ export default class MountainTile extends TileAbstract{
         this.classType = 'Mountain';
         this.resourceCount = 6;
         this.img = stoneImage;
-        this.imgSize = 480;
+        this.imgSize = 256;
     }
 
     getresourceCount(){
