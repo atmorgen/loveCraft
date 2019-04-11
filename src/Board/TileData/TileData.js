@@ -69,11 +69,12 @@ class TileData extends Component {
         var unitTab = document.getElementById('unitTab')
         
         if(tile){
-
             var tileDataNew = {
                 tileName:tile.classType,
                 x:tile.getPosition().x,
-                y:tile.getPosition().y
+                y:tile.getPosition().y,
+                resouceType:this.setResourceName(tile),
+                resourceCount:tile.resourceCount
             }
 
             if(!_.isEqual(this.state.tileData,tileDataNew)){
@@ -122,6 +123,10 @@ class TileData extends Component {
             unitTab.style.display = 'none';
         }
         
+    }
+
+    setResourceName(tile){
+        return (tile.classType === "FertileSoil") ? "Fertility: " : (tile.classType === "Forest") ? "Wood: " : (tile.classType === "Mountain") ? "Metal: " : null
     }
 
     initTab(){
@@ -210,7 +215,7 @@ class TileData extends Component {
 
                 <div id="Tile" className="tabcontent">
                     <h3>{this.state.tileData.tileName}</h3>
-                    <p>Tile Info</p>
+                    <p>{this.state.tileData.resouceType} {this.state.tileData.resourceCount}</p>
                 </div>
 
                 <div id="Unit" className="tabcontent">

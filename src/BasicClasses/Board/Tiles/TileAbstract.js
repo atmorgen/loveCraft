@@ -45,23 +45,22 @@ export default class TileAbstract{
         this.movingTo = false;
     }
 
-    drawImg(doHighlight,size,ctx){
+    drawImg(size,ctx){
         var img = new Image();
             img.src = this.img;
 
-            img.onload = () =>{
-                ctx.drawImage(img,
-                    0,
-                    0,
-                    this.imgSize,
-                    this.imgSize,
-                    this.position.x*size,
-                    this.position.y*size,
-                    size,
-                    size
-                ); 
-            }
-            
+        img.onload = () =>{
+            ctx.drawImage(img,
+                0,
+                0,
+                this.imgSize,
+                this.imgSize,
+                this.position.x*size,
+                this.position.y*size,
+                size,
+                size
+            ); 
+        }    
     }
 
     drawSelection(size,ctx){

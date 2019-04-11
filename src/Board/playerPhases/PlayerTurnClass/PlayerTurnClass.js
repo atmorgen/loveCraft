@@ -38,6 +38,8 @@ export default class PlayerTurnClass extends Component{
         this.turnSubmission = new TurnSubmission()
         this.tileSelectTurn()
     }
+
+    //Init for the tileCanvas mouse event
     tileSelectTurn(){
         var tileMoves = 0,
             targetIndex,
@@ -51,19 +53,25 @@ export default class PlayerTurnClass extends Component{
             i;
             for(i = 0;i<this.board.tiles.length;i++){
                 tile = this.board.tiles[i];
-                
+                //finds the tile that has been clicked on 
                 if(this.boardFunctions.withinTile(tile,x,y,this.size)) {
+                    //selected tile index
                     this.selectionIndex = i;
+                    //clear the canvas before drawing new selections
                     this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
+                    //draw new selection
                     tile.drawSelection(this.size,this.state.ctx)
                     break;
                 }
             }
             
-            //boolean that determines whether or not unit has already been assigned a move
+            //boolean that determines whether or not unit has already been assigned a move.  If it has a move then reassign the tiles to me movedTo tiles
             var alreadyHasMove = this.checkUnitForMove(this.boardUnits.getUnitAtSelectedTile(tile))
+            //redraw the move
             this.boardUnits.renderDrawMoving(this.size,this.board.tiles)
             
+            /* The below portion is responsible for showing and hiding the correct tile of selection image and for init'ing moves */
+
             if(tile.getIsMoveable()){
                 if(!move) {
                     move = new Move(this.state.selectedUnit,targetIndex)
@@ -106,12 +114,11 @@ export default class PlayerTurnClass extends Component{
                         }
                     }
                 }
-            }else{
-
-            }            
+            }           
         }
     }
 
+    //Resets isMoveable and movingTo of all board tiles
     clearMovingItems(){
         for(var i = 0;i<this.board.tiles.length;i++){
             this.board.tiles[i].setIsMoveableToFalse()
@@ -136,18 +143,20 @@ export default class PlayerTurnClass extends Component{
         }
     }
 
+    //handler that is called from TileData.js when the "Submit" button is clicked.  Adds the submitted move for this unit to the turnSubmission object
     submitHandler(value){
         this.turnSubmission.addMove(value[0])
-        //this.boardUnits.renderUnits(this.size,this.board.units)
         document.getElementById('tileDataBox').style.display = 'none';
     }
 
+    //handler that is called from TileData.js when the "Remove" button is clicked.  Removes the submitted move for this unit from the turnSubmission object
     removalHandler(value){
         this.turnSubmission.removeMove(value[2].unitUID)
         this.state.ctx.clearRect(0, 0, this.state.canvas.width, this.state.canvas.height);
         document.getElementById('tileDataBox').style.display = 'none';
     }
 
+    //submits the turn to firebase and then clears the turn so it will be ready for new turn phase
     submitTurn(){
         this.turnSubmission.submitTurn(this.matchID,this.uid)
         this.turnSubmission.clearMoves()
