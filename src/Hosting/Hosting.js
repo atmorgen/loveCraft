@@ -42,10 +42,7 @@ export default class Hosting{
     gameSubscription(){
         this.db.collection(DB.MATCHES).doc(this.matchID)
             .onSnapshot(async (doc)=>{
-                /*if(doc.data().phase === null) {
-                    console.log('init')
-                    new CapitalSelectionClass(this.matchID,this.uid)
-                }else */if(this.phase !== doc.data().phase){
+                if(this.phase !== doc.data().phase){
                     this.phase = doc.data().phase
                     new this.phases[doc.data().phase](this.matchID,this.uid)
                 }
