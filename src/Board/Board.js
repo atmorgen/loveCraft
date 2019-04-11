@@ -16,6 +16,8 @@ import TurnSubmission from '../BasicClasses/Match/TurnSubmission';
 //Hosting class
 import Hosting from '../Hosting/Hosting'
 import HostingFirestore from '../Hosting/HostingFirestore'
+//PlayerInfoUI
+import PlayerInfo from './PlayerInfo/PlayerInfo';
 
 //Player Phase classes
 import {
@@ -61,6 +63,7 @@ class Canvas extends Component {
         this.hostFirestore = new HostingFirestore()
         //for init correct phase class
         this.phases = {
+            "Capital":PlayerCapitalSelectClass,
             "Upkeep":PlayerUpkeepClass,
             "Turn":PlayerTurnClass,
             "Resolution":PlayerResolutionClass
@@ -183,29 +186,23 @@ class Canvas extends Component {
 
     //Determines which phase game is in and init the correct class
     initCorrectPhase(phase){
-        if(!phase){
+        if(phase === "Capital"){
             this.setState({
                 turn:<PlayerCapitalSelectClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
             })
+        }else if(phase === "Upkeep"){
+            this.setState({
+                turn:<PlayerUpkeepClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+            })
+        }else if(phase === "Turn"){
+            this.setState({
+                turn:<PlayerTurnClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+            })
         }else{
-            if(phase === "Upkeep"){
-                this.setState({
-                    turn:<PlayerUpkeepClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
-                })
-            }else if(phase === "Turn"){
-                this.setState({
-                    turn:<PlayerTurnClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
-                })
-            }else{
-                this.setState({
-                    turn:<PlayerResolutionClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
-                })
-            }
+            this.setState({
+                turn:<PlayerResolutionClass getBoard={this.getBoard} uid={this.uid} matchID={this.matchID} tileCanvas={this.state.tileCanvas.canvas} unitCtx={this.state.unitCanvas.ctx} boardFunctions={this.boardFunctions} boardUnits={this.BoardUnits} board={this.state.board} size={this.size}/>
+            })
         }
-    }
-
-    createElement(comp){
-        React.createElement(comp)
     }
 
     //Used by phase class to make sure it has the most up to date board
@@ -227,6 +224,7 @@ class Canvas extends Component {
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardSelect' ref='selectCanvas' width={this.state.width} height={this.state.height}></canvas>
+                <PlayerInfo />
                 <div>{this.state.turn}</div>
             </React.Fragment>
         )

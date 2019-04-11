@@ -1,4 +1,6 @@
-import HostingFirestore from './HostingFirestore'
+import HostingFirestore from './HostingFirestore';
+import * as DB from '../Firebase/Firestore/DB';
+import firebase from 'firebase';
 
 import {
     CapitalSelectionClass,
@@ -14,37 +16,40 @@ export default class Hosting{
         this.matchID = matchID
         this.uid = uid
         this.hostingFirestore = new HostingFirestore()
+        this.db = firebase.firestore()
         
         //bindings
-        this.hostingInit = this.hostingInit.bind(this)
-
-        this.phase = null
+        this.gameSubscription = this.gameSubscription.bind(this)
 
         this.phaseNames = [
+            "Capital",
             "Upkeep",
             "Turn",
             "Resolution"
         ]
 
         this.phases = {
-            [this.phaseNames[0]]:UpkeepClass,
-            [this.phaseNames[1]]:TurnClass,
-            [this.phaseNames[2]]:ResolutionClass
+            [this.phaseNames[0]]:CapitalSelectionClass,
+            [this.phaseNames[1]]:UpkeepClass,
+            [this.phaseNames[2]]:TurnClass,
+            [this.phaseNames[3]]:ResolutionClass
         }
+        this.phase = null
 
-        this.hostingInit()
+        this.gameSubscription()
     }
 
-    //Determines the present phase and begins the correct class
-    async hostingInit(){
-        this.phase = await this.hostingFirestore.checkForMatchPhase(this.matchID)
-        
-        if(!this.phase){
-            this.phase = new CapitalSelectionClass(this.matchID,this.uid)
-        }else{
-            this.phase = new this.phases[this.phase]()
-        }
-        //this.moveToNextPhase()
+    gameSubscription(){
+        this.db.collection(DB.MATCHES).doc(this.matchID)
+            .onSnapshot(async (doc)=>{
+                /*if(doc.data().phase === null) {
+                    console.log('init')
+                    new CapitalSelectionClass(this.matchID,this.uid)
+                }else */if(this.phase !== doc.data().phase){
+                    this.phase = doc.data().phase
+                    new this.phases[doc.data().phase](this.matchID,this.uid)
+                }
+            })
     }
 
     //looks up the present phase and then moves to the next one in order

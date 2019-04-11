@@ -87,5 +87,4 @@ export default class PlayerCapitalSelectClass extends Component{
             </React.Fragment>
         )
     }
-    //<TileData tile={this.state.selectedTile} unit={this.state.selectedUnit} move={[this.state.move,this.turnSubmission,this.state.selectedUnit]} size={this.size} onSubmit={this.submitHandler} onRemove={this.removalHandler} />
 }

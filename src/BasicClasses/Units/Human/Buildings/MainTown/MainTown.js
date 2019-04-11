@@ -8,7 +8,7 @@ class MainTown extends UnitAbstract{
         this.owner = uid
         this.name = "Main Town"
         this.race = "Human"
-
+        this.type = "Building"
 
         //////This is all information for rendering the unit on the page//////
         this.state = {

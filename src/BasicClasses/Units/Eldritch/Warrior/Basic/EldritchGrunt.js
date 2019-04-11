@@ -8,6 +8,7 @@ class EldritchGrunt extends UnitAbstract{
         this.owner = uid
         this.name = "Eldritch Grunt"
         this.race = "Eldritch"
+        this.type = "Soldier"
         this.health = 100
         this.attack = {
             min:5,

@@ -15,10 +15,28 @@ export default class HostingFirestore{
         })
     }
 
+    checkForMatchSubPhase(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
+                resolve(doc.data().subphase)
+            })
+        })
+    }
+
     setNextMatchPhase(matchID,newPhase){
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHES).doc(matchID).update({
                 phase:newPhase
+            }).then(function(){
+                resolve()
+            })
+        })
+    }
+
+    setNextMatchSubPhase(matchID,subphase){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).update({
+                subphase:subphase
             }).then(function(){
                 resolve()
             })

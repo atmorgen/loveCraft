@@ -8,6 +8,7 @@ class DruidGatherer extends UnitAbstract{
         this.owner = uid
         this.name = "Druid Gatherer"
         this.race = "Druid"
+        this.type = "Gatherer"
         this.health = 100
         this.attack = {
             min:5,
