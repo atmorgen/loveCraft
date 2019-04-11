@@ -38,7 +38,7 @@ class TileData extends Component {
         })
     }
 
-    getMousePos(e){
+    getMousePos(e){        
         var tileBox = document.getElementById('tileDataBox')
         this.visibility()
         var x = e.clientX,
@@ -49,6 +49,7 @@ class TileData extends Component {
 
         tileBox.style.left = (x+xAlter) + 'px'
         tileBox.style.top = (y+yAlter) + 'px'
+        
     }
 
     visibility(){
@@ -81,8 +82,8 @@ class TileData extends Component {
                 })
             }
         }
-
-        if(unit){
+        //sets up tile data for units
+        if(unit && unit.unitType !== "Building"){
             unitTab.style.display = 'block'
             var unitDataNew = {
                 unitName:unit.name,
@@ -97,7 +98,21 @@ class TileData extends Component {
                 unitHealth:unit.health,
                 unitSpeed:unit.speed
             }
-
+            
+            if(!_.isEqual(this.state.unitData,unitDataNew)){
+                this.setState({
+                    unitData:unitDataNew
+                })
+            }
+        //sets up tile data for buildings
+        }else if(unit && unit.unitType === "Building"){
+            unitTab.style.display = 'block'
+            var unitDataNew = {
+                unitName:unit.name,
+                unitRace:unit.race,
+                unitOwner:unit.username,
+            }
+            
             if(!_.isEqual(this.state.unitData,unitDataNew)){
                 this.setState({
                     unitData:unitDataNew
@@ -106,6 +121,7 @@ class TileData extends Component {
         }else{
             unitTab.style.display = 'none';
         }
+        
     }
 
     initTab(){
@@ -125,8 +141,6 @@ class TileData extends Component {
         for(i = 0;i<turnButtons.length;i++){
             turnButtons[i].style.display = 'none';
         }
-
-        
 
         if(this.props.unit){
             if(this.props.unit.username === localStorage.getItem('username')){
@@ -173,6 +187,7 @@ class TileData extends Component {
     }
 
     checkUnitForMove(){
+        
         if(this.props.move[2]){
             for(var i = 0;i<this.props.move[1].moves.length;i++){
                 var move = this.props.move[1].moves[i].move

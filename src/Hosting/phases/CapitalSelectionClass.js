@@ -1,5 +1,6 @@
 import firebase from 'firebase'
 import Firestore from '../../Firebase/Firestore/firestore'
+import HostingFirestore from '../HostingFirestore';
 import * as DB from '../../Firebase/Firestore/DB';
 
 //for creating units
@@ -14,6 +15,7 @@ export default class CapitalSelectionClass{
         this.createCapital = this.createCapital.bind(this)
         this.db = firebase.firestore()
         this.firestore = new Firestore()
+        this.hostingFirestore = new HostingFirestore()
         this.boardUnits = new BoardUnits(matchID,uid)
         this.matchID = matchID
         this.uid = uid
@@ -22,6 +24,7 @@ export default class CapitalSelectionClass{
             ctx:document.getElementById('canvasBoardUnit').getContext('2d'),
             canvas:document.getElementById('canvasBoardUnit')
         }
+        this.matchData = null
         this.matchesSubscription()
     }
 
@@ -30,8 +33,10 @@ export default class CapitalSelectionClass{
             .onSnapshot((snapshot)=>{
                     snapshot.docChanges().forEach((change)=>{
                         if(change.type === "modified"){
-                            var matchData = change.doc.data()
-                            this.checkForSubmissionUpdate(matchData,change.doc.id)
+                            if(change.doc.data().turnSubmission.length>1){
+                                this.matchData = change.doc.data().turnSubmission
+                                this.checkForSubmissionUpdate(change.doc.id)
+                            }
                         }
                     })
                                 
@@ -39,17 +44,17 @@ export default class CapitalSelectionClass{
     }
 
     //checks if both players have submitted a capital location.  If they have then kill the listener and create the capitals
-    async checkForSubmissionUpdate(matchData,id){
-        var turnSubmission = matchData.turnSubmission
+    async checkForSubmissionUpdate(){
+        var turnSubmission = this.matchData
         //if both players have submitted a turn
         if(turnSubmission.length > 1){
+            await this.firestore.clearFirebaseSubmissions(this.matchID)
             this.listener()
             var player1Sub = JSON.parse(turnSubmission[0]).submission
             var player2Sub = JSON.parse(turnSubmission[1]).submission
             await this.createCapital(player1Sub.submission.position,player1Sub.uid)
             await this.createCapital(player2Sub.submission.position,player2Sub.uid)
             
-            await this.firestore.clearFirebaseSubmissions(this.matchID)
             await this.setPhaseToUpkeep()
         }
     }
@@ -61,9 +66,9 @@ export default class CapitalSelectionClass{
     setPhaseToUpkeep(){
         return new Promise((resolve)=>{
             this.db.collection(DB.MATCHES).doc(this.matchID).update({
-                phase:"Upkeep"
+                phase:"Upkeep",
+                subphase:"Resources"
             }).then(function(){
-                console.log('Moving to Upkeep Phase')
                 resolve()
             })
         })

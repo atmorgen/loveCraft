@@ -8,6 +8,7 @@ class SwineKnight extends UnitAbstract{
         this.owner = uid
         this.name = "Swine Knight"
         this.race = "Druid"
+        this.type = "Soldier"
         this.health = 100
         this.attack = {
             min:5,

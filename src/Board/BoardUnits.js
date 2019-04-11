@@ -72,7 +72,8 @@ class BoardUnits{
             speed:unit.speed,
             health:unit.health,
             attack:unit.attack,
-            armor:unit.armor
+            armor:unit.armor,
+            unitType:unit.type
         })
         this.firestore.addUnitsToMatch(this.matchID,JSON.stringify(matchUnits))
     }
@@ -117,7 +118,7 @@ class BoardUnits{
         for(var j = 0;j<tiles.length;j++){
             var drawingTile = tiles[j];
             if(drawingTile.getMovingTo()){
-                drawingTile.drawMoving(size,this.state.ctx)
+                drawingTile.drawMoving(size,document.getElementById('canvasBoardSelect').getContext('2d'))
             } 
         }
     }

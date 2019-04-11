@@ -57,15 +57,14 @@ export default class PlayerUpkeepClass extends Component{
             this.setState({
                 selectedTile:this.board.tiles[i]
             })
-
         }
     }
 
     async upkeepInit(){
         await this.boardUnits.unitCreation(new EldritchGrunt(this.uid,80,4,6,this.state.ctx,this.state.canvas))
-        await this.boardUnits.unitCreation(new DruidGatherer(this.uid,80,5,6,this.state.ctx,this.state.canvas))
-        await this.boardUnits.unitCreation(new SwineKnight(this.uid,80,6,6,this.state.ctx,this.state.canvas))
-        await this.boardUnits.unitCreation(new Cultist(this.uid,80,7,6,this.state.ctx,this.state.canvas))
+        //await this.boardUnits.unitCreation(new DruidGatherer(this.uid,80,5,6,this.state.ctx,this.state.canvas))
+        //await this.boardUnits.unitCreation(new SwineKnight(this.uid,80,6,6,this.state.ctx,this.state.canvas))
+        //await this.boardUnits.unitCreation(new Cultist(this.uid,80,7,6,this.state.ctx,this.state.canvas))
     }
 
     render() {

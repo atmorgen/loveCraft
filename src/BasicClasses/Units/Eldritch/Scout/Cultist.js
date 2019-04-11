@@ -8,6 +8,7 @@ class Cultist extends UnitAbstract{
         this.owner = uid
         this.name = "Cultist"
         this.race = "Eldritch"
+        this.type = "Scout"
         this.health = 100
         this.attack = {
             min:5,

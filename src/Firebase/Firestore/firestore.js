@@ -173,7 +173,7 @@ class Firestore{
         return new Promise(async (resolve)=>{
             if(!(await this.checkIfAlreadySubmitted(matchID,uid))){
                 this.db.collection(DB.MATCHES).doc(matchID).update({
-                    "turnSubmission":firebase.firestore.FieldValue.arrayUnion(JSON.stringify(submission))
+                    turnSubmission:firebase.firestore.FieldValue.arrayUnion(submission)
                 }).then(function(){
                     resolve()
                 })

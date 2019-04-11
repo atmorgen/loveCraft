@@ -37,7 +37,7 @@ export default class TurnSubmission{
             moves:this.getMoves()
         }
         if(!(await this.firestore.checkIfAlreadySubmitted(matchID,uid))){
-            await this.firestore.submitTurnToMatch(matchID,JSON.stringify(submission))
+            await this.firestore.submitTurnToMatch(matchID,uid,JSON.stringify(submission))
         }else{
             console.log('you\'ve already submitted a turn!')
         }

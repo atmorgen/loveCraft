@@ -33,7 +33,6 @@ export default class BoardFunctions{
         
         for(var i = 0;i<surroundingIndex.length;i++){
             var tile = board.tiles[surroundingIndex[i]]
-            
             //tile is on the map
             if(tile){
                 if(!tile.getMovingTo()){
