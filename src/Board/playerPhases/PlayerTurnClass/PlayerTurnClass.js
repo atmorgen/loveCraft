@@ -48,7 +48,6 @@ export default class PlayerTurnClass extends Component{
 
     //Init for the tileCanvas mouse event
     tileSelectTurn(){
-        console.log(this.board.tiles)
         // eslint-disable-next-line
         this.tileCanvas.addEventListener('mousedown', this.listener = (e) =>{
             this.mouseEvent(e)
