@@ -1,5 +1,5 @@
 import TileAbstract from '../TileAbstract'
-import stoneImage from './Stone_Tile_5.png'
+import stoneImage from './mtn.png'
 
 export default class MountainTile extends TileAbstract{
     

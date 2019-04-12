@@ -1,5 +1,5 @@
 import TileAbstract from '../TileAbstract';
-import grass from './Grass_Tile_Test.png'
+import grass from './grass.png'
 
 export default class FertileSoil extends TileAbstract{
 
