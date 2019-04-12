@@ -40,15 +40,15 @@ export default class PlayerTurnClass extends Component{
         this.turnSubmission = new TurnSubmission()
         this.tileSelectTurn()
         this.mouseEvent = this.mouseEvent.bind(this)
+
+        
+        //reclassifies tiles
+        //this.boardReclassified = this.boardFunctions.reClassifyBoard(this.props.board)
     }
 
     //Init for the tileCanvas mouse event
     tileSelectTurn(){
-        console.log(this.board.units)
-        var tileMoves = 0,
-            targetIndex,
-            tile,
-            move;
+        console.log(this.board.tiles)
         // eslint-disable-next-line
         this.tileCanvas.addEventListener('mousedown', this.listener = (e) =>{
             this.mouseEvent(e)
@@ -86,7 +86,6 @@ export default class PlayerTurnClass extends Component{
             this.boardUnits.renderDrawMoving(this.size,this.board.tiles)
             
             /* The below portion is responsible for showing and hiding the correct tile of selection image and for init'ing moves */
-
             if(this.tile.getIsMoveable()){
                 if(!this.move) {
                     this.move = new Move(this.state.selectedUnit,this.state.selectedUnit.position.x,this.state.selectedUnit.position.y)
@@ -147,7 +146,8 @@ export default class PlayerTurnClass extends Component{
                 var move = this.turnSubmission.moves[i].move
                 if(move.unit.unitUID === target.unitUID){
                     for(var j = 0;j<move.moves.length;j++){
-                        this.board.tiles[move.moves[j].index].drawMoving(this.size,this.state.ctx)
+                        var index = this.boardFunctions.getIndexFromPosition(move.moves[j].x,move.moves[j].y)
+                        this.board.tiles[index].drawMoving(this.size,this.state.ctx)
                     }
                     output = true                    
                 }

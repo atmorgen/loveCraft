@@ -25,6 +25,10 @@ export default class BoardFunctions{
         }
     }
 
+    getIndexFromPosition(x,y){
+        return (x + y*20)
+    }
+
     getSurroundingTiles(board,index,size, ctx){
         var surroundingIndex = [index-1, //left
                                 index+1, //right
