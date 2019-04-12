@@ -165,7 +165,6 @@ class Canvas extends Component {
             }
             //if the units have changed in any way
             if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
-                console.log('unit')
                 //re-rendering units
                 this.BoardUnits.renderUnits(reclassedBoard.units)
             }
