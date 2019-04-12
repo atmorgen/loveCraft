@@ -43,12 +43,20 @@ export default class PlayerCapitalSelectClass extends Component{
     componentDidUpdate(){
         this.board = this.props.getBoard()
     }
+
+    componentWillUnmount(){
+        this.tileCanvas.removeEventListener('mousedown',this.listener)
+    }
     
     //highlights the selected tile for capital location decisions
     tileSelectTurn(){
-        // eslint-disable-next-line
-        this.listener = this.tileCanvas.onmousedown = (e) =>{
-            var clientRect = this.tileCanvas.getBoundingClientRect(),
+        this.tileCanvas.addEventListener('mousedown', this.listener = (e) =>{
+            this.mouseEvent(e)
+        })
+    }
+
+    mouseEvent(e){
+        var clientRect = this.tileCanvas.getBoundingClientRect(),
             x = e.clientX - clientRect.left,
             y = e.clientY - clientRect.top,
             i;
@@ -65,8 +73,6 @@ export default class PlayerCapitalSelectClass extends Component{
             this.setState({
                 selectedTile:this.board.tiles[i]
             })
-
-        }
     }
 
     submitTurn(){
