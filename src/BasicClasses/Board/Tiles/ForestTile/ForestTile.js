@@ -1,5 +1,7 @@
 import TileAbstract from '../TileAbstract'
-import forestImage from './Tree_TIle_Test.png'
+import treesImage from './trees.png'
+import trees2Image from './trees2.png'
+import trees3Image from './trees3.png'
 
 export default class ForestTile extends TileAbstract{
     
@@ -8,7 +10,7 @@ export default class ForestTile extends TileAbstract{
         this.color = "darkgreen";
         this.classType = 'Forest';
         this.resourceCount = 5;
-        this.img = forestImage;
+        this.img = this.getImage();
         this.imgSize = 256;
     }
 
@@ -41,7 +43,16 @@ export default class ForestTile extends TileAbstract{
     }
 
     getImage(){
-        return this.img;
+var rando = Math.floor(Math.random() * 3); 
+
+switch (rando){
+    case 0: return treesImage;
+    case 1: return trees2Image;
+    case 2: return trees3Image;
+    default : return trees2Image;
+}
+
+        return trees2Image;
     }
 
     getImageSize(){
