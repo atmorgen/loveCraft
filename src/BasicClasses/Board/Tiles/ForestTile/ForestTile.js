@@ -43,16 +43,14 @@ export default class ForestTile extends TileAbstract{
     }
 
     getImage(){
-var rando = Math.floor(Math.random() * 3); 
+        var rando = Math.floor(Math.random() * 3); 
 
-switch (rando){
-    case 0: return treesImage;
-    case 1: return trees2Image;
-    case 2: return trees3Image;
-    default : return trees2Image;
-}
-
-        return trees2Image;
+        switch (rando){
+            case 0: return treesImage;
+            case 1: return trees2Image;
+            case 2: return trees3Image;
+            default : return trees2Image;
+        }
     }
 
     getImageSize(){

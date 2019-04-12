@@ -51,4 +51,14 @@ export default class HostingFirestore{
         })
     }
 
+    clearTurnSubmissions(matchID){
+        return new Promise((resolve)=>{
+            this.db.collection(DB.MATCHES).doc(matchID).update({
+                turnSubmission:[]
+            }).then(function(){
+                resolve()
+            })
+        })
+    }
+
 }

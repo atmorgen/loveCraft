@@ -189,7 +189,7 @@ class Firestore{
             this.db.collection(DB.MATCHES).doc(matchID).get().then(function(doc){
                 var submissions = doc.data().turnSubmission
                 for(var i = 0;i<submissions.length;i++){
-                    var submission = JSON.parse(submissions[i]).submission
+                    var submission = JSON.parse(submissions[i])
                     if(uid === submission.uid) resolve(true)
                 }
                 resolve(false)

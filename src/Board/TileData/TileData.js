@@ -7,6 +7,7 @@ class TileData extends Component {
         super()
         this.submitMove = this.submitMove.bind(this)
         this.removeMove = this.removeMove.bind(this)
+        this.listener = null
     }
     state = { 
         tileData:{
@@ -30,10 +31,15 @@ class TileData extends Component {
         this.renderTileData()
         this.initTab()
     }
+    
+    componentWillUnmount(){
+        var canvas = document.getElementById('canvasBoardTile')
+        canvas.removeEventListener('mousedown',this.listener)
+    }
 
     mouseEvents(){
         var canvas = document.getElementById('canvasBoardTile')
-        canvas.addEventListener('mousedown',(e)=>{
+        canvas.addEventListener('mousedown',this.listener = (e)=>{
             this.getMousePos(e)
         })
     }
@@ -54,7 +60,9 @@ class TileData extends Component {
 
     visibility(){
         var tileBox = document.getElementById('tileDataBox')
-        if(tileBox.style.display === 'none' || tileBox.style.display === "") tileBox.style.display = 'block'
+        if(tileBox){
+            if(tileBox.style.display === 'none' || tileBox.style.display === "") tileBox.style.display = 'block'
+        }
     }
 
     closeBox(){

@@ -1,12 +1,12 @@
-import swineKnightPNG from './SwineKnight.png'
-import UnitAbstract from '../../UnitAbstract'
+import BoarKnightPNG from './Boar_Knight.png'
+import UnitAbstract from '../../../UnitAbstract'
 
-class SwineKnight extends UnitAbstract{
+class BoarKnight extends UnitAbstract{
     constructor(uid,size,x,y,context,canvas){
         super()
         //////This is the units game information
         this.owner = uid
-        this.name = "Swine Knight"
+        this.name = "Boar Knight"
         this.race = "Druid"
         this.type = "Soldier"
         this.health = 100
@@ -24,7 +24,7 @@ class SwineKnight extends UnitAbstract{
         this.state = {
             size: size
         }
-        this.img = swineKnightPNG
+        this.img = BoarKnightPNG
         this.position = {
             x:x,
             y:y
@@ -34,8 +34,8 @@ class SwineKnight extends UnitAbstract{
         this.bitMapLength = 3
 
         //these should match the size of each SEPERATE image on the bitmap, i.e. if it's three 32x32 images on the bitmap then the spriteWidth and spriteHeight should be 32
-        this.spriteWidth  = 252
-        this.spriteHeight = 252
+        this.spriteWidth  = 256
+        this.spriteHeight = 256
 
         //These determine where we are looking on the actual bitmap image.  If it's top to bottom and the images are 32x32 then to go to the next image you will set pixelsTop
         //to ```pixelsTops+=spriteHeight``` to get to the next image
@@ -64,4 +64,4 @@ class SwineKnight extends UnitAbstract{
 
 }
  
-export default SwineKnight;
+export default BoarKnight;
