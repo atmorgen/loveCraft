@@ -73,7 +73,6 @@ export default class PlayerCapitalSelectClass extends Component{
         var submission = new Submission(this.state.selectedTile,this.uid)
         this.firestore.submitTurnToMatch(this.matchID,this.uid,JSON.stringify(submission))
         document.getElementById('popUpMessageBorder').style.display = 'none'
-        this.listener()
     }
     
     render() {

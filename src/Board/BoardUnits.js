@@ -3,6 +3,7 @@
 //Druids
 import SwineKnight from '../BasicClasses/Units/Druid/Soldier/SwineKnight';
 import DruidGatherer from '../BasicClasses/Units/Druid/Gatherer/DruidGatherer';
+import DruidCapital from '../BasicClasses/Units/Druid/Buildings/Capital/DruidCapital';
 
 //Eldritch
 import EldritchGrunt from '../BasicClasses/Units/Eldritch/Warrior/Basic/EldritchGrunt';
@@ -45,7 +46,8 @@ class BoardUnits{
 
         this.druidTypes = [
             DruidGatherer,
-            SwineKnight
+            SwineKnight,
+            DruidCapital
         ]
     }
     

@@ -7,12 +7,13 @@ import * as DB from '../../Firebase/Firestore/DB';
 import BoardUnits from '../../Board/BoardUnits';
 
 //test capital
-import MainTown from '../../BasicClasses/Units/Human/Buildings/MainTown/MainTown';
+import DruidCapital from '../../BasicClasses/Units/Druid/Buildings/Capital/DruidCapital';
+import DruidGatherer from '../../BasicClasses/Units/Druid/Gatherer/DruidGatherer';
 
 export default class CapitalSelectionClass{
     constructor(matchID,uid){
         //bindings
-        this.createCapital = this.createCapital.bind(this)
+        this.createCapitalandGatherer = this.createCapitalandGatherer.bind(this)
         this.db = firebase.firestore()
         this.firestore = new Firestore()
         this.hostingFirestore = new HostingFirestore()
@@ -49,18 +50,52 @@ export default class CapitalSelectionClass{
         //if both players have submitted a turn
         if(turnSubmission.length > 1){
             await this.firestore.clearFirebaseSubmissions(this.matchID)
-            this.listener()
             var player1Sub = JSON.parse(turnSubmission[0]).submission
             var player2Sub = JSON.parse(turnSubmission[1]).submission
-            await this.createCapital(player1Sub.submission.position,player1Sub.uid)
-            await this.createCapital(player2Sub.submission.position,player2Sub.uid)
+            await this.createCapitalandGatherer(player1Sub.submission.position,player1Sub.uid)
+            await this.createCapitalandGatherer(player2Sub.submission.position,player2Sub.uid)
             
             await this.setPhaseToUpkeep()
+            this.listener()
         }
     }
 
-    async createCapital(position,uid){
-        await this.boardUnits.unitCreation(new MainTown(uid,80,position.x,position.y,this.state.ctx,this.state.canvas))
+    async createCapitalandGatherer(position,uid){
+        var tiles = JSON.parse((await this.firestore.getBoardInformation(this.matchID)).board.tiles)
+        await this.boardUnits.unitCreation(new DruidCapital(uid,80,position.x,position.y,this.state.ctx,this.state.canvas))
+
+
+        //Responsible for determining whether the gatherer start position is in water or not
+                
+        var posX = [
+            position.x-1,
+            position.x+1,
+            position.x,
+            position.x
+        ]
+
+        var posY = [
+            position.y,
+            position.y,
+            position.y-1,
+            position.y+1
+        ]
+        
+        for(var i = 0;i<posX.length;i++){
+            var tile = this.checkTileForWater(tiles,posX[i],posY[i])
+            if(tile){
+                if(tile.classType !== "Water"){
+                    await this.boardUnits.unitCreation(new DruidGatherer(uid,80,posX[i],posY[i],this.state.ctx,this.state.canvas))
+                    return
+                }
+            }
+        }
+    }
+
+    checkTileForWater(tiles,x,y){
+        return tiles.filter(t =>
+                    t.position.x === x && t.position.y === y
+                )[0]
     }
 
     setPhaseToUpkeep(){

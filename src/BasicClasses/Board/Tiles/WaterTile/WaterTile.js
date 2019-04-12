@@ -1,5 +1,5 @@
 import TileAbstract from '../TileAbstract'
-import waterTile from './WaterTile.png'
+import waterTile from './Water_Tile.png'
 
 export default class WaterTile extends TileAbstract{
     
@@ -8,7 +8,7 @@ export default class WaterTile extends TileAbstract{
         this.color = "blue";
         this.classType = 'Water';
         this.img = waterTile;
-        this.imgSize = 240;
+        this.imgSize = 256;
     }
 
     getClassType(){
