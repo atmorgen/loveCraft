@@ -9,7 +9,7 @@ export default class PlayerResolutionClass extends Component{
     render() {
         return (
             <React.Fragment>
-                
+                <div>Resolution</div>
             </React.Fragment>
         )
     }

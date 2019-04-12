@@ -9,6 +9,7 @@ import BoardUnits from '../../Board/BoardUnits';
 //test capital
 import DruidCapital from '../../BasicClasses/Units/Druid/Buildings/Capital/DruidCapital';
 import DruidGatherer from '../../BasicClasses/Units/Druid/Gatherer/DruidGatherer';
+import BoarKnight from '../../BasicClasses/Units/Druid/Soldier/Tank/BoarKnight';
 
 export default class CapitalSelectionClass{
     constructor(matchID,uid){

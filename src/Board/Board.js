@@ -72,7 +72,6 @@ class Canvas extends Component {
 
     componentDidMount(){
         this.gameInit()
-        
     }
 
     getUID(){
@@ -130,7 +129,7 @@ class Canvas extends Component {
     }
 
     componentWillUnmount(){
-        //this.leaveMatch()
+        this.leaveMatch()
     }
 
     //deletes the instance of the match
@@ -160,12 +159,13 @@ class Canvas extends Component {
             reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
             //reclassing the units
             //if the tiles have changed in any way
-            if(!_.isEqual(reclassedBoard.tiles,this.state.board.tiles)){
+            if(this.compareTilesForResourceCounts(reclassedBoard.tiles)){
                 //rerunning board creation
                 this.boardCreation();
             }
             //if the units have changed in any way
             if(!_.isEqual(reclassedBoard.units,this.state.board.units)){
+                console.log('unit')
                 //re-rendering units
                 this.BoardUnits.renderUnits(reclassedBoard.units)
             }
@@ -173,6 +173,17 @@ class Canvas extends Component {
         }else{
             this.leaveMatch()
         }
+    }
+
+
+    //Using this to see if there is a need to redraw the board due to a change in resource counts
+    compareTilesForResourceCounts(reclassedBoard){
+        for(var i = 0;i<reclassedBoard.length;i++){
+            if(reclassedBoard[i].resourceCount !== this.state.board.tiles[i].resourceCount){
+                return true
+            }
+        }
+        return false
     }
 
     //Responsible for redrawing the rectangles each time there is an update

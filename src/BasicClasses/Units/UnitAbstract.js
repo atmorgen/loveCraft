@@ -21,6 +21,10 @@ export default class Unit{
         this.move = input;
     }
 
+    getPosition(){
+        return this.position;
+    }
+
     clearMove(){
         this.move=null;
     }

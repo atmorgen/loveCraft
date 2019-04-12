@@ -1,7 +1,8 @@
 //Unit Imports for now until indexes are set up
 
 //Druids
-import SwineKnight from '../BasicClasses/Units/Druid/Soldier/SwineKnight';
+import SwineKnight from '../BasicClasses/Units/Druid/Soldier/Basic/SwineKnight';
+import BoarKnight from '../BasicClasses/Units/Druid/Soldier/Tank/BoarKnight';
 import DruidGatherer from '../BasicClasses/Units/Druid/Gatherer/DruidGatherer';
 import DruidCapital from '../BasicClasses/Units/Druid/Buildings/Capital/DruidCapital';
 
@@ -47,6 +48,7 @@ class BoardUnits{
         this.druidTypes = [
             DruidGatherer,
             SwineKnight,
+            BoarKnight,
             DruidCapital
         ]
     }

@@ -1,8 +1,11 @@
 export default class Move{
-    constructor(unit,startingIndex){
+    constructor(unit,x,y){
         this.move = {
             unit:unit,
-            startingIndex:startingIndex,
+            startingPosition:{
+                x:x,
+                y:y
+            },
             moves:[]
         }
     }
@@ -22,9 +25,10 @@ export default class Move{
         return this.move.moves;
     }
 
-    addNewPosition(index){
+    addNewPosition(x,y){
         this.move.moves.push({
-            index
+            x:x,
+            y:y
         })
     }
 }
