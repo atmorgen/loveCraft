@@ -61,10 +61,41 @@ export default class CapitalSelectionClass{
     }
 
     async createCapitalandGatherer(position,uid){
-        //var tiles = JSON.parse((await this.firestore.getBoardInformation(this.matchID)).board.tiles)
+        var tiles = JSON.parse((await this.firestore.getBoardInformation(this.matchID)).board.tiles)
         await this.boardUnits.unitCreation(new DruidCapital(uid,80,position.x,position.y,this.state.ctx,this.state.canvas))
-        await this.boardUnits.unitCreation(new DruidGatherer(uid,80,position.x-1,position.y,this.state.ctx,this.state.canvas))
+
+
+        //Responsible for determining whether the gatherer start position is in water or not
+                
+        var posX = [
+            position.x-1,
+            position.x+1,
+            position.x,
+            position.x
+        ]
+
+        var posY = [
+            position.y,
+            position.y,
+            position.y-1,
+            position.y+1
+        ]
         
+        for(var i = 0;i<posX.length;i++){
+            var tile = this.checkTileForWater(tiles,posX[i],posY[i])
+            if(tile){
+                if(tile.classType !== "Water"){
+                    await this.boardUnits.unitCreation(new DruidGatherer(uid,80,posX[i],posY[i],this.state.ctx,this.state.canvas))
+                    return
+                }
+            }
+        }
+    }
+
+    checkTileForWater(tiles,x,y){
+        return tiles.filter(t =>
+                    t.position.x === x && t.position.y === y
+                )[0]
     }
 
     setPhaseToUpkeep(){
