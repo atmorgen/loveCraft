@@ -44,6 +44,7 @@ export default class PlayerTurnClass extends Component{
 
     //Init for the tileCanvas mouse event
     tileSelectTurn(){
+        console.log(this.board.units)
         var tileMoves = 0,
             targetIndex,
             tile,
