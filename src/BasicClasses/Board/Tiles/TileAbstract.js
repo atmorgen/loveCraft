@@ -105,7 +105,6 @@ export default class TileAbstract{
     drawMoving(size,ctx){
         var img = new Image();
             img.src = moving
-        
         img.onload = () => {
             ctx.drawImage(img,
                 0,
