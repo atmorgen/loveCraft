@@ -83,7 +83,6 @@ export default class PlayerTurnClass extends Component{
             var alreadyHasMove = this.checkUnitForMove(this.boardUnits.getUnitAtSelectedTile(this.tile))
             //redraw the move
             this.boardUnits.renderDrawMoving(this.size,this.board.tiles)
-            
             /* The below portion is responsible for showing and hiding the correct tile of selection image and for init'ing moves */
             if(this.tile.getIsMoveable()){
                 if(!this.move) {
@@ -93,7 +92,8 @@ export default class PlayerTurnClass extends Component{
                     this.move.addNewPosition(this.tile.getPosition().x,this.tile.getPosition().y)
                     this.tile.drawMoving(this.size,this.state.ctx)
                     if(this.tileMoves+1 < this.move.getUnit().speed){
-                        this.boardFunctions.getSurroundingTiles(this.board,i,this.size,this.state.ctx)
+                        //this.boardFunctions.getSurroundingTiles(this.board,i,this.size,this.state.ctx)
+                        this.boardFunctions.getSurroundingTiles(this.board,this.tile.position.x,this.tile.position.y,this.size,this.state.ctx)
                     }
                     this.setState({
                         move:this.move
@@ -118,12 +118,12 @@ export default class PlayerTurnClass extends Component{
                 this.targetIndex = i
             }
 
-            if(!alreadyHasMove){
+            if(alreadyHasMove === false){
                 if(this.state.selectedUnit){
                     if(this.state.selectedUnit.owner === this.uid){
                         if(this.tileMoves < this.state.selectedUnit.speed){
-                            this.boardFunctions.getSurroundingTiles(this.board,i,this.size,this.state.ctx)                    
-                        }
+                            this.boardFunctions.getSurroundingTiles(this.board,this.state.selectedUnit.position.x,this.state.selectedUnit.position.y,this.size,this.state.ctx) 
+                       }
                     }
                 }
             }       
@@ -145,8 +145,12 @@ export default class PlayerTurnClass extends Component{
                 var move = this.turnSubmission.moves[i].move
                 if(move.unit.unitUID === target.unitUID){
                     for(var j = 0;j<move.moves.length;j++){
-                        var index = this.boardFunctions.getIndexFromPosition(move.moves[j].x,move.moves[j].y)
-                        this.board.tiles[index].drawMoving(this.size,this.state.ctx)
+                        //var index = this.boardFunctions.getIndexFromPosition(move.moves[j].x,move.moves[j].y)
+                        //this.board.tiles[index].drawMoving(this.size,this.state.ctx)
+                        this.board.tiles.filter(tile =>
+                            tile.getPosition().x === move.moves[j].x && tile.getPosition().y === move.moves[j].y
+                        )[0].drawMoving(this.size,this.state.ctx)
+                        
                     }
                     output = true                    
                 }

@@ -157,6 +157,7 @@ class Canvas extends Component {
             //reclassing the tiles
             var reclassedBoard = this.boardFunctions.reClassifyBoard(data.board)
             reclassedBoard = this.BoardUnits.reClassifyUnits(reclassedBoard)
+
             //reclassing the units
             //if the tiles have changed in any way
             if(this.compareTilesForResourceCounts(reclassedBoard.tiles)){

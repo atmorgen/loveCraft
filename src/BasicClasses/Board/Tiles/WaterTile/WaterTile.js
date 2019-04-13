@@ -4,10 +4,10 @@ import TileAbstract from '../TileAbstract'
 import waterTile from './WaterImages/Water_Tile.png'
 
 //Singles Images
-import waterBottom from './WaterImages/Singles/Water_Tile_Bottom.png'
-import waterTop from './WaterImages/Singles/Water_Tile_Top.png'
-import waterLeft from './WaterImages/Singles/Water_Tile_Left.png'
-import waterRight from './WaterImages/Singles/Water_Tile_Right.png'
+import waterBottom from './WaterImages/Singles/wateroneedge.png'
+import waterTop from './WaterImages/Singles/wateronesidetop.png'
+import waterLeft from './WaterImages/Singles/wateronesideleft.png'
+import waterRight from './WaterImages/Singles/wateronesideright.png'
 
 //doubles Images
 import waterLeftRight from './WaterImages/Doubles/Water_Tile_LeftRight.png'
@@ -34,9 +34,7 @@ export default class WaterTile extends TileAbstract{
         this.classType = 'Water';
         this.imgSize = 256;
         this.surrounding = surrounding
-        this.img = this.getCorrectWaterImage();
-        this.getCorrectWaterImage()
-        
+        this.img = this.getCorrectWaterImage(); 
     }
 
     getClassType(){
@@ -60,7 +58,6 @@ export default class WaterTile extends TileAbstract{
     }
 
     getCorrectWaterImage(){
-
         if(this.getSurrounding()){
             var nonWaterSides = this.getSurrounding().filter(tile => tile).length
             switch(nonWaterSides){
@@ -76,7 +73,7 @@ export default class WaterTile extends TileAbstract{
                     return this.allWaterSides()
             }
         }else{
-            return waterTile
+            return this.allWaterSides()
         }
         
 
