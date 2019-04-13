@@ -5,25 +5,29 @@ class PlayerInfo extends Component {
 
     constructor(props){
         super(props)
-        this.foodDemand = 0
-        this.food = 0
-        this.foodChange = 0
-        this.gold = 0
-        this.goldChange = 0
-        this.wood = 0
-        this.woodChange = 0
-        this.metal = 0
-        this.metalChange = 0
     }
-    state = {  }
+    state = {  
+        foodDemand: 0,
+        food: 0,
+        foodChange: 0,
+        gold: 0,
+        goldChange: 0,
+        wood: 0,
+        woodChange: 0,
+        metal: 0,
+        metalChange: 0
+    }
+
+
+    
     render() { 
         return (
             <div id='playerInfo'>
-                <p>Food Demand: {this.foodDemand}</p>
-                <p>Food: {this.food} ({this.foodChange})</p>                
-                <p>Gold: {this.gold} ({this.goldChange})</p>
-                <p>Wood: {this.wood} ({this.woodChange})</p>
-                <p>Metal: {this.metal} ({this.metalChange})</p> 
+                <p>Food Demand: {this.state.foodDemand}</p>
+                <p>Food: {this.state.food} ({this.state.foodChange})</p>                
+                <p>Gold: {this.state.gold} ({this.state.goldChange})</p>
+                <p>Wood: {this.state.wood} ({this.state.woodChange})</p>
+                <p>Metal: {this.state.metal} ({this.state.metalChange})</p> 
             </div>
         );
     }
