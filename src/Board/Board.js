@@ -168,12 +168,20 @@ class Canvas extends Component {
                 //re-rendering units
                 this.BoardUnits.renderUnits(reclassedBoard.units)
             }
+            //check and set resources
+            this.getAndCheckCorrectPlayerResourceCounts(data)
             this.setState({board: reclassedBoard})
         }else{
             this.leaveMatch()
         }
     }
 
+    getAndCheckCorrectPlayerResourceCounts(data){
+        var playerResources = data.p1.id === this.uid ? data.p1.resources : data.p2.resources
+        this.setState({
+            resources:playerResources
+        })
+    }
 
     //Using this to see if there is a need to redraw the board due to a change in resource counts
     compareTilesForResourceCounts(reclassedBoard){
@@ -234,7 +242,7 @@ class Canvas extends Component {
                 <canvas id='canvasBoardUnit' ref='unitCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardTile' ref='tileCanvas' width={this.state.width} height={this.state.height}></canvas>
                 <canvas id='canvasBoardSelect' ref='selectCanvas' width={this.state.width} height={this.state.height}></canvas>
-                <PlayerInfo />
+                <PlayerInfo resources={this.state.resources}/>
                 <div>{this.state.turn}</div>
             </React.Fragment>
         )
