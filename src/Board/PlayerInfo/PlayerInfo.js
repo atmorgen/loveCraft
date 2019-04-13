@@ -14,13 +14,9 @@ class PlayerInfo extends Component {
     state = {  
         resources:0,
         foodDemand: 0,
-        food: 0,
         foodChange: 0,
-        gold: 0,
         goldChange: 0,
-        wood: 0,
         woodChange: 0,
-        metal: 0,
         metalChange: 0
     }
 
@@ -32,10 +28,7 @@ class PlayerInfo extends Component {
                 })
             }
         }
-        
     }
-
-
     
     render() { 
         return (
