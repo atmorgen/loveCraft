@@ -48,18 +48,19 @@ export default class TileAbstract{
     drawImg(size,ctx){
         var img = new Image();
             img.src = this.img;
+                
         img.onload = () =>{
-            ctx.drawImage(img,
-                0,
-                0,
-                this.imgSize,
-                this.imgSize,
-                this.position.x*size,
-                this.position.y*size,
-                size,
-                size
-            ); 
-        } 
+                ctx.drawImage(img,
+                    0,
+                    0,
+                    this.imgSize,
+                    this.imgSize,
+                    this.position.x*size,
+                    this.position.y*size,
+                    size,
+                    size
+                );
+        }
     }
 
     drawSelection(size,ctx){

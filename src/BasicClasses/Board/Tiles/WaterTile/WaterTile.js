@@ -1,5 +1,30 @@
 import TileAbstract from '../TileAbstract'
-import waterTile from './Water_Tile.png'
+
+//noSides Image
+import waterTile from './WaterImages/Water_Tile.png'
+
+//Singles Images
+import waterBottom from './WaterImages/Singles/Water_Tile_Bottom.png'
+import waterTop from './WaterImages/Singles/Water_Tile_Top.png'
+import waterLeft from './WaterImages/Singles/Water_Tile_Left.png'
+import waterRight from './WaterImages/Singles/Water_Tile_Right.png'
+
+//doubles Images
+import waterLeftRight from './WaterImages/Doubles/Water_Tile_LeftRight.png'
+import waterTopBottom from './WaterImages/Doubles/Water_Tile_TopBottom.png'
+import waterLeftTop from './WaterImages/Doubles/Water_Tile_LeftTop.png'
+import waterLeftBottom from './WaterImages/Doubles/Water_Tile_LeftBottom.png'
+import waterRightBottom from './WaterImages/Doubles/Water_Tile_RightBottom.png'
+import waterRightTop from './WaterImages/Doubles/Water_Tile_RightTop.png'
+
+//triples Images
+import waterBottomOpen from './WaterImages/Triples/Water_Tile_BottomOpen.png'
+import waterLeftOpen from './WaterImages/Triples/Water_Tile_LeftOpen.png'
+import waterRightOpen from './WaterImages/Triples/Water_Tile_RightOpen.png'
+import waterTopOpen from './WaterImages/Triples/Water_Tile_TopOpen.png'
+
+//allSides Image
+import pond from './WaterImages/pond.png'
 
 export default class WaterTile extends TileAbstract{
     
@@ -9,7 +34,9 @@ export default class WaterTile extends TileAbstract{
         this.classType = 'Water';
         this.imgSize = 256;
         this.surrounding = surrounding
-        this.img = waterTile;
+        this.img = this.getCorrectWaterImage();
+        this.getCorrectWaterImage()
+        
     }
 
     getClassType(){
@@ -33,11 +60,59 @@ export default class WaterTile extends TileAbstract{
     }
 
     getCorrectWaterImage(){
-        var left = this.getSurrounding()[0],
-            right =this.getSurrounding()[1],
-            above = this.getSurrounding()[2],
-            below =this.getSurrounding()[3]
 
+        if(this.getSurrounding()){
+            var nonWaterSides = this.getSurrounding().filter(tile => tile).length
+            switch(nonWaterSides){
+                case 1:
+                    return this.singleNonWaterSide()
+                case 2:
+                    return this.doubleNonWaterSide()
+                case 3:
+                    return this.tripleNonWaterSide()
+                case 4:
+                    return this.quadNonWaterSide()
+                default:
+                    return this.allWaterSides()
+            }
+        }else{
+            return waterTile
+        }
         
+
+    }
+
+    allWaterSides(){
+        return waterTile
+    }
+
+    singleNonWaterSide(){
+        if(this.getSurrounding()[0]) return waterLeft
+        else if(this.getSurrounding()[1]) return waterRight
+        else if(this.getSurrounding()[2]) return waterTop
+        else return waterBottom
+    }
+
+    doubleNonWaterSide(){
+        if(this.getSurrounding()[0] && this.getSurrounding()[1]) return waterLeftRight
+        else if(this.getSurrounding()[2] && this.getSurrounding()[3]) return waterTopBottom
+        else if(this.getSurrounding()[0] && this.getSurrounding()[2]) return waterLeftTop
+        else if(this.getSurrounding()[0] && this.getSurrounding()[3]) return waterLeftBottom
+        else if(this.getSurrounding()[1] && this.getSurrounding()[2]) return waterRightTop
+        else if(this.getSurrounding()[1] && this.getSurrounding()[3]) return waterRightBottom
+        else return waterTile
+    }
+
+    tripleNonWaterSide(){
+        
+        if(!this.getSurrounding()[0]) return waterLeftOpen
+        else if(!this.getSurrounding()[1]) return waterRightOpen
+        else if(!this.getSurrounding()[2]) return waterTopOpen
+        else if(!this.getSurrounding()[3]) return waterBottomOpen
+        else return waterTile
+    }
+
+    quadNonWaterSide(){
+        return pond;
     }
 }
