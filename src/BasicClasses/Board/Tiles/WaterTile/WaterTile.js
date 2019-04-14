@@ -4,24 +4,24 @@ import TileAbstract from '../TileAbstract'
 import waterTile from './WaterImages/Water_Tile.png'
 
 //Singles Images
-import waterBottom from './WaterImages/Singles/wateroneedge.png'
-import waterTop from './WaterImages/Singles/wateronesidetop.png'
-import waterLeft from './WaterImages/Singles/wateronesideleft.png'
-import waterRight from './WaterImages/Singles/wateronesideright.png'
+import waterBottom from './WaterImages/Singles/onebottom.png'
+import waterTop from './WaterImages/Singles/onetop.png'
+import waterLeft from './WaterImages/Singles/oneleft.png'
+import waterRight from './WaterImages/Singles/oneright.png'
 
 //doubles Images
-import waterLeftRight from './WaterImages/Doubles/Water_Tile_LeftRight.png'
-import waterTopBottom from './WaterImages/Doubles/Water_Tile_TopBottom.png'
-import waterLeftTop from './WaterImages/Doubles/Water_Tile_LeftTop.png'
-import waterLeftBottom from './WaterImages/Doubles/Water_Tile_LeftBottom.png'
-import waterRightBottom from './WaterImages/Doubles/Water_Tile_RightBottom.png'
-import waterRightTop from './WaterImages/Doubles/Water_Tile_RightTop.png'
+import waterLeftRight from './WaterImages/Doubles/twoleftright.png'
+import waterTopBottom from './WaterImages/Doubles/twotopbottom.png'
+import waterLeftTop from './WaterImages/Doubles/twolefttop.png'
+import waterLeftBottom from './WaterImages/Doubles/twoleftbottom.png'
+import waterRightBottom from './WaterImages/Doubles/tworightbottom.png'
+import waterRightTop from './WaterImages/Doubles/tworighttop.png'
 
 //triples Images
-import waterBottomOpen from './WaterImages/Triples/Water_Tile_BottomOpen.png'
-import waterLeftOpen from './WaterImages/Triples/Water_Tile_LeftOpen.png'
-import waterRightOpen from './WaterImages/Triples/Water_Tile_RightOpen.png'
-import waterTopOpen from './WaterImages/Triples/Water_Tile_TopOpen.png'
+import waterBottomOpen from './WaterImages/Triples/threelefttopright.png'
+import waterLeftOpen from './WaterImages/Triples/threetoprightbottom.png'
+import waterRightOpen from './WaterImages/Triples/threetopleftbottom.png'
+import waterTopOpen from './WaterImages/Triples/threebottomleftright.png'
 
 //allSides Image
 import pond from './WaterImages/pond.png'
