@@ -17,7 +17,6 @@ const INITIAL_STATE = {
 
 const SignUpPage = () => (
     <div>
-        <h1>SignUp</h1>
         <SignUpForm />
     </div>
 );
@@ -76,40 +75,56 @@ class SignUpFormBase extends Component {
             username === '';
 
 
-        return (  
-            <form onSubmit={this.onSubmit}>
-                <input
-                    name="username"
-                    value={username}
-                    onChange={this.onChange}
-                    type="text"
-                    placeholder="Username"
-                />
-                <input
-                    name="email"
-                    value={email}
-                    onChange={this.onChange}
-                    type="text"
-                    placeholder="Email Address"
-                />
-                <input
-                    name="passwordOne"
-                    value={passwordOne}
-                    onChange={this.onChange}
-                    type="password"
-                    placeholder="Password"
-                />
-                <input
-                    name="passwordTwo"
-                    value={passwordTwo}
-                    onChange={this.onChange}
-                    type="password"
-                    placeholder="Confirm Password"
-                />
-                <button disabled={isInvalid} type="submit">Sign Up</button>
+        return (
+            <div className="signUpForm">
+            <h1>Sign Up</h1>  
+            <form className="innerSignUpForm" onSubmit={this.onSubmit}>
+                <ul>
+                    <li>
+                        <label>Username</label>
+                        <input
+                            htmlFor="UserName"
+                            name="username"
+                            value={username}
+                            onChange={this.onChange}
+                            type="text"
+                        />
+                    </li>
+                    <li>
+                        <label>Email</label>
+                        <input
+                            name="email"
+                            value={email}
+                            onChange={this.onChange}
+                            type="text"
+                        />
+                    </li>
+                    <li>
+                        <label>Password</label>
+                        <input
+                            name="passwordOne"
+                            value={passwordOne}
+                            onChange={this.onChange}
+                            type="password"
+                        />
+                    </li>
+                    <li>
+                        <label>Confirm Password</label>
+                        <input
+                            name="passwordTwo"
+                            value={passwordTwo}
+                            onChange={this.onChange}
+                            type="password"
+                        />
+                    </li>
+                    <li>
+                        <button disabled={isInvalid} className="signUpButton" type="submit">Sign Up</button>
+                    </li>
 
                 {error && <p>{error.message}</p>}
+                </ul>
             </form>
+            </div>
         );
     }
 }
