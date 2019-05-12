@@ -6,8 +6,8 @@ import { withFirebase } from '../../../Firebase';
 import * as ROUTES from '../../routes'
 
 const PasswordForgetPage = () => (
-  <div>
-    <h1>PasswordForget</h1>
+  <div className="resetPassword">
+    <h1>Reset Password</h1>
     <PasswordForgetForm />
   </div>
 );
