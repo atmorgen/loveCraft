@@ -64,7 +64,6 @@ class SignInFormBase extends Component {
                 value={email}
                 onChange={this.onChange}
                 type="text"
-                placeholder="Email Address"
               />
             </li>
             <li>
@@ -74,7 +73,6 @@ class SignInFormBase extends Component {
                 value={password}
                 onChange={this.onChange}
                 type="password"
-                placeholder="Password"
               />
             </li>
             <li>
