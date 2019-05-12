@@ -29,15 +29,17 @@ class Search extends Component {
     searchingformatchscreen(){
         return  <div>
                     <div>Loading...</div> 
-                    <button onClick={this.cancelSearch}>Cancel</button>
+                    <button onClick={this.cancelSearch} className="cancelButton">Cancel</button>
                 </div>
     }
 
     staticSearchScreen(){
-        return <div>
-                    <div>Search Page</div>
-                    <button onClick={this.beginSearch}>Find Match</button>
-                </div>
+        return (
+            <div className="findMatch">
+                <h1>Find a match!</h1>
+                <button onClick={this.beginSearch} className="findMatchButton">Find Match</button>
+            </div>
+        )
     }
 
     //The method that determines what is shown on the search screen based on whether or not the user is searching for a match
@@ -49,7 +51,6 @@ class Search extends Component {
         return (  
             <React.Fragment>
                 <this.SearchScreen />
-                <hr /> 
             </React.Fragment>
         );
     }

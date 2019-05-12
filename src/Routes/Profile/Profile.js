@@ -10,10 +10,12 @@ class Profile extends Component {
     state = {  }
     render() { 
         return (  
-            <div>
+            <div className="profilePage">
                 <h1>Profile Page</h1>
-                <PasswordForgetForm />
-                <PasswordChangeForm />
+                <div className="passwordForms">
+                    <PasswordForgetForm />
+                    <PasswordChangeForm />
+                </div>
             </div>
 
         );
