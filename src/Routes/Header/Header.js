@@ -6,6 +6,7 @@ import SignOutButton from '../Account/SignOut/SignOut';
 import { AuthUserContext } from '../Session';
 import { Firestore } from '../../Firebase/Firestore';
 import firebase from 'firebase'
+import "./Header.css"
 
 class Navigation extends Component {
     constructor(props){
@@ -46,32 +47,31 @@ class Navigation extends Component {
     );
     
     NavigationAuth = () => {
-       return   <div>{this.state.username}
-                    <ul>
-                        <li>
-                            <Link to={ROUTES.HOME}>Home</Link>
-                        </li>
-                        <li>
-                            <Link to={ROUTES.PROFILE}>Profile</Link>
-                        </li>
-                        <li>
-                            <Link to={ROUTES.SEARCH}>Search</Link>
-                        </li>
-                        <li>
-                            <SignOutButton />
-                        </li>
-                    </ul>
-                </div>
+       return (
+       <div>
+        <nav>
+            <div className="currentUser">
+                Hi, {this.state.username}
+            </div>
+            <div>
+                <Link to={ROUTES.HOME} className="navLinks">Home</Link>
+                <Link to={ROUTES.PROFILE} className="navLinks">Profile</Link>
+                <Link to={ROUTES.SEARCH} className="navLinks">Search</Link>
+                <SignOutButton />
+            </div>
+            </nav>
+        </div>
+       )
     }
     
     NavigationNonAuth = () => {
-        return  <div>
-                    <ul>
-                        <li>
-                            <Link to={ROUTES.SIGN_IN}>Sign In</Link>
-                        </li>
-                    </ul>
-                </div>
+        return (
+        <div>
+            <nav className="navNonAuth">
+                <Link to={ROUTES.SIGN_IN} className="signIn">Sign In</Link>
+            </nav>
+        </div>
+        ) 
     }
 
 

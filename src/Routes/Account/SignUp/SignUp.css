@@ -1,0 +1,101 @@
+.signUpForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.innerSignUpForm{
+	max-width:400px;
+	background:rgb(255, 255, 255);
+	border-radius:2px;
+	padding:20px;
+}
+
+.innerSignUpForm ul{
+	list-style:none;
+	padding:0;
+	margin:0;	
+}
+
+.innerSignUpForm li{
+	display: block;
+	padding: 9px;
+	border:1px solid rgb(109, 109, 109);
+	margin-bottom: 30px;
+	border-radius: 3px;
+}
+
+.innerSignUpForm li:last-child{
+	border:none;
+	margin-bottom: 0px;
+	text-align: center;
+}
+
+.innerSignUpForm li > label{
+	display: block;
+	float: left;
+	margin-top: -19px;
+	background: #FFFFFF;
+	height: 14px;
+	padding: 2px 5px 2px 5px;
+	color: rgb(109, 109, 109);
+	font-size: 14px;
+	overflow: hidden;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.innerSignUpForm input[type="text"],
+.innerSignUpForm input[type="date"],
+.innerSignUpForm input[type="datetime"],
+.innerSignUpForm input[type="email"],
+.innerSignUpForm input[type="number"],
+.innerSignUpForm input[type="search"],
+.innerSignUpForm input[type="time"],
+.innerSignUpForm input[type="url"],
+.innerSignUpForm input[type="password"],
+.innerSignUpForm textarea,
+.innerSignUpForm select 
+{
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	width: 100%;
+	display: block;
+	outline: none;
+	border: none;
+	height: 25px;
+	line-height: 25px;
+	font-size: 16px;
+	padding: 0;
+}
+
+.innerSignUpForm li > span{
+	background: rgb(255, 255, 255);
+	display: block;
+	padding: 3px;
+	margin: 0 -9px -9px -9px;
+	text-align: center;
+	color: #C0C0C0;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+.innerSignUpForm textarea{
+	resize:none;
+}
+
+.signUpButton {
+    margin-top: 15px;
+    color: rgb(48, 48, 48);
+    background-color: rgb(255, 217, 0);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.signUpButton:disabled {
+    background-color: rgba(255, 217, 0, 0.699);
+    cursor: auto;
+    color: rgb(48, 48, 48);
+}

@@ -5,10 +5,11 @@ import { SignUpLink } from '../SignUp/SignUp';
 import { PasswordForgetLink } from '../PasswordForget/PasswordForget';
 import { withFirebase } from '../../../Firebase';
 import * as ROUTES from '../../routes';
+import "./Login.css"
 
 const SignInPage = () => (
-  <div>
-    <h1>SignIn</h1>
+  <div className="signInMain">
+    <h1>Sign In</h1>
     <SignInForm />
     <PasswordForgetLink />
     <SignUpLink />
@@ -54,26 +55,32 @@ class SignInFormBase extends Component {
     const isInvalid = password === '' || email === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          name="password"
-          value={password}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign In
-        </button>
+      <form onSubmit={this.onSubmit} className="signInForm">
+          <ul>
+            <li>
+              <label>Email</label>
+              <input
+                name="email"
+                value={email}
+                onChange={this.onChange}
+                type="text"
+              />
+            </li>
+            <li>
+              <label>Password</label>
+              <input
+                name="password"
+                value={password}
+                onChange={this.onChange}
+                type="password"
+              />
+            </li>
+            <li>
+              <button disabled={isInvalid} type="submit" className="signInButton">Sign In</button>
+            </li>
 
-        {error && <p>{error.message}</p>}
+          {error && <p>{error.message}</p>}
+          </ul>
       </form>
     );
   }
